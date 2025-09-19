@@ -11,6 +11,7 @@ interface Customer {
 const DisplayCustomers: React.FC = () => {
 	const navigate = useNavigate();
 	const [customers, setCustomers] = useState<Customer[]>([]);
+	const [selectedCustomer, setSelectedCustomer] = useState<number | null>(null);
 
 	useEffect(() => {
 		fetch('http://localhost:4000/customers')
@@ -20,14 +21,21 @@ const DisplayCustomers: React.FC = () => {
 	}, []);
 
 		const renderCustomerRows = () => {
-			return customers.map((customer) => (
-				<tr key={customer.id}>
-					<td>{customer.id}</td>
-					<td>{customer.name}</td>
-					<td>{customer.email}</td>
-					<td>{customer.password}</td>
-				</tr>
-			));
+			return customers.map((customer) => {
+				const isSelected = selectedCustomer === customer.id;
+				return (
+					<tr
+						key={customer.id}
+						style={{ fontWeight: isSelected ? 'bold' : 'normal', cursor: 'pointer' }}
+						onClick={() => setSelectedCustomer(isSelected ? null : customer.id)}
+					>
+						<td>{customer.id}</td>
+						<td>{customer.name}</td>
+						<td>{customer.email}</td>
+						<td>{customer.password}</td>
+					</tr>
+				);
+			});
 		};
 
 		return (
@@ -46,7 +54,13 @@ const DisplayCustomers: React.FC = () => {
 						{renderCustomerRows()}
 					</tbody>
 				</table>
-				<button onClick={() => navigate('/add_customer')}>Add/Update Customer</button>
+				<button onClick={() => {
+                    if (selectedCustomer == null) {
+                        navigate('/add_customer');
+                    } else {
+                        navigate(`/update_customer/${selectedCustomer}`);
+                    }
+                }}>Add/Update Customer</button>
 			</div>
 		);
 };

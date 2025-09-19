@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getAll } from '../../../ProjectAssets/memdb.js';
 
 interface Customer {
 	id: number;
@@ -13,15 +14,21 @@ const DisplayCustomers: React.FC = () => {
 	const [customers, setCustomers] = useState<Customer[]>([]);
 	const [selectedCustomer, setSelectedCustomer] = useState<number | null>(null);
 
-	useEffect(() => {
-		fetch('http://localhost:4000/customers')
-			.then((res) => res.json())
-			.then((data) => setCustomers(data))
-			.catch((err) => console.error('Failed to fetch customers:', err));
-	}, []);
+    //Dont use this until later versions
+	// useEffect(() => {
+	// 	fetch('http://localhost:4000/customers')
+	// 		.then((res) => res.json())
+	// 		.then((data) => setCustomers(data))
+	// 		.catch((err) => console.error('Failed to fetch customers:', err));
+	// }, []);
 
-		const renderCustomerRows = () => {
-			return customers.map((customer) => {
+    useEffect(() => {
+        const data = getAll('customers') as Customer[];
+        setCustomers(data);
+    }, []);
+
+	const renderCustomerRows = () => {
+		return customers.map((customer) => {
 				const isSelected = selectedCustomer === customer.id;
 				return (
 					<tr

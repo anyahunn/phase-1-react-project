@@ -13,7 +13,7 @@ function AddCustomer(props: any) {
         e.preventDefault();
         // Generate a new id if needed
         const newCustomer = {
-            id: id, // or use a better id logic
+            id: Number(id), // or use a better id logic
             name: customer.name,
             email: customer.email,
             password: customer.password

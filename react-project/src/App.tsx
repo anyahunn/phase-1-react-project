@@ -23,7 +23,7 @@ function App() {
     );
   };
 
-  const deleteCustomer = (id: number) => {
+  const deleteCustomer = (id:number) => {
     setCustomers(prev => prev.filter(c => c.id !== id));
   };
 

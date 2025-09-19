@@ -27,12 +27,16 @@ function App() {
     setCustomers(prev => prev.filter(c => c.id !== id));
   };
 
+  const findHighestId = () => {
+    return customers.reduce((maxId, customer) => Math.max(maxId, customer.id), 0) + 1;
+  }
+
   return (
     <Router>
       <div className="App">
         <Routes>
           <Route path="/" element={<DisplayCustomers customers={customers} customer={null} />} />
-          <Route path="/add_customer/:id" element={<AddCustomer id={customers.length} addCustomer={addCustomer} />} />
+          <Route path="/add_customer/:id" element={<AddCustomer id={findHighestId()} addCustomer={addCustomer} />} />
           <Route path="/delete_customer/:id" element={<DeleteCustomer customers={customers} deleteCustomer={deleteCustomer}/>} />
           <Route path="/update_customer/:id" element={<UpdateCustomer customers={customers} updateCustomer={updateCustomer} />} />
         </Routes>

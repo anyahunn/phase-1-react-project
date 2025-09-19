@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 
 function AddCustomer() {
     const [customer, setCustomer] = useState({id:"", name:"", email:"", password:""});
-    const [id, setId] = useState("");
-    const [name, setName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
+    // const [id, setId] = useState("");
+    // const [name, setName] = useState("");
+    // const [email, setEmail] = useState("");
+    // const [password, setPassword] = useState("");
     //let customer = {id:"", name:"", email:"", password:"",};
     return(
         <div className='page'>
@@ -18,7 +18,7 @@ function AddCustomer() {
                         id="id"
                         placeholder="Enter id"
                         value={customer.id}
-                        onChange={(e) => setId(e.target.value)}
+                        onChange={(e) => setCustomer({...customer, id: e.target.value})}
                     />
                 </div>
                 <div>
@@ -28,7 +28,7 @@ function AddCustomer() {
                         id="name"
                         placeholder="Enter your name"
                         value={customer.name}
-                        onChange={(e) => setName(e.target.value)}
+                        onChange={(e) => setCustomer({...customer, name: e.target.value})}
                     />
                 </div>
                 <div>
@@ -39,9 +39,8 @@ function AddCustomer() {
                         id="email"
                         placeholder="Enter your email"
                         value={customer.email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => setCustomer({...customer, email: e.target.value})}
                     />
-                    <input type="email" id="email" name="email" required />
                 </div>
                 <div>
                     <label htmlFor="password">Password:</label>
@@ -50,7 +49,7 @@ function AddCustomer() {
                         id="Password"
                         placeholder="Enter your password"
                         value={customer.password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => setCustomer({...customer, password: e.target.value})}
                     />
                 </div>
                 

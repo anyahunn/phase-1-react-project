@@ -14,7 +14,7 @@ const DisplayCustomers: React.FC<{ customers: Customer[], customer: Customer | n
 	const navigate = useNavigate();
 	//const [customers, setCustomers] = useState<Customer[]>([]); Use for v2 and v3
 	const [selectedCustomer, setSelectedCustomer] = useState<number | null>(null);
-    var buttonText = "Add Customer";
+    const buttonText = selectedCustomer ? "Update Customer" : "Add Customer";
     //Dont use this until v3 
 	// useEffect(() => {
 	// 	fetch('http://localhost:4000/customers')
@@ -65,14 +65,25 @@ const DisplayCustomers: React.FC<{ customers: Customer[], customer: Customer | n
 					})}
 				</tbody>
 			</table>
-            {/* if(selectedCustomer !== null) {
-                buttonText = "Update Customer";
-            }else{
-                buttonText = "Add Customer";
-            } */}
-			<button className="add-customer-btn" onClick={() => {navigate('/add_customer/:id'); }}>{buttonText}</button>
+            
+			<button
+				className="add-customer-btn"
+				onClick={() => {
+					if (selectedCustomer) {
+                        console.log(customers.length);
+						navigate(`/update_customer/${selectedCustomer}`);
+					} else {
+                        console.log(customers.length);
+						navigate(`/add_customer/${customers.length + 1}`);
+					}
+				}}
+			>
+				{buttonText}
+			</button>
 		</div>
 	);
 };
 
 export default DisplayCustomers;
+
+

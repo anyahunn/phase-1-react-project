@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 function AddCustomer(props: any) {
-    const [customer, setCustomer] = useState({id:props.id, name:"", email:"", password:""});
+    const {id} = useParams();
+    const [customer, setCustomer] = useState({id:id, name:"", email:"", password:""});
     const navigate = useNavigate();
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         // Generate a new id if needed
         const newCustomer = {
-            id: props.id, // or use a better id logic
+            id: id, // or use a better id logic
             name: customer.name,
             email: customer.email,
             password: customer.password

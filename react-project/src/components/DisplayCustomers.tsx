@@ -15,6 +15,7 @@ const DisplayCustomers: React.FC<{ customers: Customer[], customer: Customer | n
 	//const [customers, setCustomers] = useState<Customer[]>([]); Use for v2 and v3
 	const [selectedCustomer, setSelectedCustomer] = useState<number | null>(null);
     const buttonText = selectedCustomer ? "Update Customer" : "Add Customer";
+	const buttonText2 = "Delete Customer";
     //Dont use this until v3 
 	// useEffect(() => {
 	// 	fetch('http://localhost:4000/customers')
@@ -79,6 +80,25 @@ const DisplayCustomers: React.FC<{ customers: Customer[], customer: Customer | n
 				}}
 			>
 				{buttonText}
+			</button>
+
+			<button
+				className="delete-customer-btn"
+				onClick={() => {
+					if (selectedCustomer) {
+                        console.log(customers.length);
+						navigate(`/delete_customer/${selectedCustomer}`);
+					} else {
+                        console.log(customers.length);
+					}
+				}}
+				disabled={!selectedCustomer}
+				style={{
+                    backgroundColor: !selectedCustomer ? '#ccc' : '',
+                    cursor: !selectedCustomer ? 'not-allowed' : 'pointer'
+                }}
+			>
+				{buttonText2}
 			</button>
 		</div>
 	);

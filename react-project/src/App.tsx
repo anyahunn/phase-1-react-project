@@ -23,13 +23,17 @@ function App() {
     );
   };
 
+  const deleteCustomer = (id: number) => {
+    setCustomers(prev => prev.filter(c => c.id !== id));
+  };
+
   return (
     <Router>
       <div className="App">
         <Routes>
           <Route path="/" element={<DisplayCustomers customers={customers} customer={null} />} />
           <Route path="/add_customer/:id" element={<AddCustomer id={customers.length} addCustomer={addCustomer} />} />
-          <Route path="/delete_customer/:id" element={<DeleteCustomer />} />
+          <Route path="/delete_customer/:id" element={<DeleteCustomer customers={customers} deleteCustomer={deleteCustomer}/>} />
           <Route path="/update_customer/:id" element={<UpdateCustomer customers={customers} updateCustomer={updateCustomer} />} />
         </Routes>
       </div>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import './UpdateCustomer.css';
 
 function UpdateCustomer(props: any) {
     const navigate = useNavigate();
@@ -31,8 +32,8 @@ function UpdateCustomer(props: any) {
 
     return(
         <div className='page'>
-            <h2>Update Customer</h2>
-            <form onSubmit={handleSubmit}>
+            <h2 className='update-customer-title'>Update Customer</h2>
+            <form onSubmit={handleSubmit} className="update-customer-form">
                 <div>
                     <label htmlFor="name">Name:</label>
                     <input
@@ -65,7 +66,7 @@ function UpdateCustomer(props: any) {
                 </div>
                 <button type="submit">Update Customer</button>
             </form>
-            <button onClick={cancel}>Cancel</button>
+            <button className='cancel-button' onClick={cancel}>Cancel</button>
         </div>
     )
 }

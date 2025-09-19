@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import './AddCustomer.css';
 
 function AddCustomer(props: any) {
     const {id} = useParams();
@@ -22,8 +23,8 @@ function AddCustomer(props: any) {
     };
     return(
         <div className='page'>
-            <h2>Add Customer</h2>
-            <form onSubmit={handleSubmit}>
+            <h2 className="add-customer-title">Add Customer</h2>
+            <form onSubmit={handleSubmit} className="add-customer-form">
                 <div>
                     {/* <label htmlFor="id">ID:</label>
                     <input
@@ -69,7 +70,7 @@ function AddCustomer(props: any) {
 
                 <button type="submit">Add Customer</button>
             </form>
-            <button onClick={cancel}>Cancel</button>
+            <button className="cancel-button" onClick={cancel}>Cancel</button>
         </div>
     )
 }

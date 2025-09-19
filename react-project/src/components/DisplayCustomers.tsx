@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface Customer {
 	id: number;
@@ -8,6 +9,7 @@ interface Customer {
 }
 
 const DisplayCustomers: React.FC = () => {
+	const navigate = useNavigate();
 	const [customers, setCustomers] = useState<Customer[]>([]);
 
 	useEffect(() => {
@@ -30,7 +32,7 @@ const DisplayCustomers: React.FC = () => {
 
 		return (
 			<div>
-				<h2>All Customers</h2>
+				<h2>Customer List</h2>
 				<table border={1} cellPadding={8}>
 					<thead>
 						<tr>
@@ -44,6 +46,7 @@ const DisplayCustomers: React.FC = () => {
 						{renderCustomerRows()}
 					</tbody>
 				</table>
+				<button onClick={() => navigate('/add_customer')}>Add/Update Customer</button>
 			</div>
 		);
 };

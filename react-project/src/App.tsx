@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css';
-//import DisplayCustomers from './components/DisplayCustomers';
+import DisplayCustomers from './components/DisplayCustomers';
 import AddCustomer from './components/AddCustomer';
 import DeleteCustomer from './components/DeleteCustomer';
 
@@ -11,7 +11,9 @@ function App() {
         <nav>
           <ul>
             <li>
-              {/* <Link to="/customers">Display Customers</Link> */}
+              <Link to="/customers">Display Customers</Link>
+            </li>
+            <li>
               <Link to="/add_customer">Add Customer</Link>
             </li>
             <li>
@@ -20,7 +22,7 @@ function App() {
           </ul>
         </nav>
         <Routes>
-          {/* <Route path="/customers" element={<DisplayCustomers />} /> */}
+          <Route path="/customers" element={<DisplayCustomers />} />
           <Route path="/add_customer" element={<AddCustomer />} />
           <Route path="/delete_customer" element={<DeleteCustomer />} />
         </Routes>

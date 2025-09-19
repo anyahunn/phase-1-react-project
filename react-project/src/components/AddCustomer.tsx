@@ -1,25 +1,35 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-function AddCustomer() {
-    const [customer, setCustomer] = useState({id:"", name:"", email:"", password:""});
-    // const [id, setId] = useState("");
-    // const [name, setName] = useState("");
-    // const [email, setEmail] = useState("");
-    // const [password, setPassword] = useState("");
-    //let customer = {id:"", name:"", email:"", password:"",};
+function AddCustomer(props: any) {
+    const [customer, setCustomer] = useState({id:props.id, name:"", email:"", password:""});
+    const navigate = useNavigate();
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        // Generate a new id if needed
+        const newCustomer = {
+            id: props.id, // or use a better id logic
+            name: customer.name,
+            email: customer.email,
+            password: customer.password
+        };
+        props.addCustomer(newCustomer);
+        navigate('/'); // or '/displayCustomers' if that's your route
+    };
     return(
         <div className='page'>
             <h2>Add Customer</h2>
-            <form>
+            <form onSubmit={handleSubmit}>
                 <div>
-                    <label htmlFor="id">ID:</label>
+                    {/* <label htmlFor="id">ID:</label>
                     <input
                         type="text"
                         id="id"
                         placeholder="Enter id"
                         value={customer.id}
                         onChange={(e) => setCustomer({...customer, id: e.target.value})}
-                    />
+                    /> */}
+
                 </div>
                 <div>
                     <label htmlFor="name">Name:</label>
@@ -53,7 +63,7 @@ function AddCustomer() {
                     />
                 </div>
 
-                <button type="submit" onClick={()=>setCustomer({id:customer.id, name:customer.name, email:customer.email, password:customer.password})}>Add Customer</button>
+                <button type="submit">Add Customer</button>
             </form>
         </div>
     )

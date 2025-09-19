@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { getAll } from '../../../ProjectAssets/memdb.js';
 import './DisplayCustomers.css';
 
@@ -10,11 +10,11 @@ interface Customer {
 	password: string;
 }
 
-const DisplayCustomers: React.FC<{ customers: Customer[] }> = ({ customers }) => {
+const DisplayCustomers: React.FC<{ customers: Customer[], customer: Customer | null }> = ({ customers, customer }) => {
 	const navigate = useNavigate();
 	//const [customers, setCustomers] = useState<Customer[]>([]); Use for v2 and v3
 	const [selectedCustomer, setSelectedCustomer] = useState<number | null>(null);
-
+    var buttonText = "Add Customer";
     //Dont use this until v3 
 	// useEffect(() => {
 	// 	fetch('http://localhost:4000/customers')
@@ -28,6 +28,12 @@ const DisplayCustomers: React.FC<{ customers: Customer[] }> = ({ customers }) =>
     //     const data = getAll('customers') as Customer[];
     //     setCustomers(data);
     // }, []);
+
+    // useEffect(() => {
+    //     if (customer){
+    //         customers = [...customers, customer];
+    //     }
+    // })
 
 	return (
 		<div>
@@ -59,7 +65,12 @@ const DisplayCustomers: React.FC<{ customers: Customer[] }> = ({ customers }) =>
 					})}
 				</tbody>
 			</table>
-			<button className="add-customer-btn" onClick={() => navigate('/add_customer')}>Add Customer</button>
+            {/* if(selectedCustomer !== null) {
+                buttonText = "Update Customer";
+            }else{
+                buttonText = "Add Customer";
+            } */}
+			<button className="add-customer-btn" onClick={() => {navigate('/add_customer/:id'); }}>{buttonText}</button>
 		</div>
 	);
 };

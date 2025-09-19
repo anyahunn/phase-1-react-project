@@ -1,0 +1,72 @@
+.button {
+  margin: 20px auto;
+  display: block;
+  padding: 10px 20px;
+  background: #6c63ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.button:hover {
+  background: #5548c8;
+}
+
+/* Center the form and add shadow */
+.add-customer-form {
+  width: 400px;
+  margin: 40px auto;
+  padding: 24px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.add-customer-form label {
+  display: block;
+  margin-bottom: 8px;
+  color: #6c63ff;
+  font-weight: 500;
+}
+
+.add-customer-form input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #f9f9f9;
+}
+
+.add-customer-form button {
+  width: 100%;
+  padding: 10px 0;
+  background: #6c63ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+.add-customer-form button:hover {
+  background: #5548c8;
+}
+
+.add-customer-title {
+  text-align: center;
+  color: #6c63ff;
+  margin-bottom: 24px;
+}
+.cancel-button {
+  margin: 10px auto;
+  display: block;
+  padding: 8px 16px;
+  background: #bd1818; /* Soft red */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}

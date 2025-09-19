@@ -10,7 +10,7 @@ interface Customer {
 	password: string;
 }
 
-const DisplayCustomers: React.FC = () => {
+const DisplayCustomers: React.FC<{ customers: Customer[] }> = ({ customers }) => {
 	const navigate = useNavigate();
 	//const [customers, setCustomers] = useState<Customer[]>([]); Use for v2 and v3
 	const [selectedCustomer, setSelectedCustomer] = useState<number | null>(null);
@@ -28,12 +28,6 @@ const DisplayCustomers: React.FC = () => {
     //     const data = getAll('customers') as Customer[];
     //     setCustomers(data);
     // }, []);
-
-    let customers = [
-        { id: 1, name: 'John Doe', email: 'john@example.com', password: 'password123' },
-        { id: 2, name: 'Jane Smith', email: 'jane@example.com', password: 'password456' },
-        { id: 3, name: 'Alice Johnson', email: 'alice@example.com', password: 'password789' }
-    ]
 
 	return (
 		<div>

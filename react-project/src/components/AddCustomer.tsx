@@ -52,8 +52,8 @@ function AddCustomer() {
                         onChange={(e) => setCustomer({...customer, password: e.target.value})}
                     />
                 </div>
-                
-                <button type="submit" onClick={()=>setCustomer({id, name, email, password})}>Add Customer</button>
+
+                <button type="submit" onClick={()=>setCustomer({id:customer.id, name:customer.name, email:customer.email, password:customer.password})}>Add Customer</button>
             </form>
         </div>
     )

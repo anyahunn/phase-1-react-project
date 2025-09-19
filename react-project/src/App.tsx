@@ -8,21 +8,8 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <nav>
-          <ul>
-            <li>
-              <Link to="/customers">Display Customers</Link>
-            </li>
-            <li>
-              <Link to="/add_customer">Add Customer</Link>
-            </li>
-            <li>
-              <Link to="/delete_customer">Delete Customer</Link>
-            </li>
-          </ul>
-        </nav>
         <Routes>
-          <Route path="/customers" element={<DisplayCustomers />} />
+          <Route path="/" element={<DisplayCustomers />} />
           <Route path="/add_customer" element={<AddCustomer />} />
           <Route path="/delete_customer" element={<DeleteCustomer />} />
         </Routes>

@@ -7,6 +7,9 @@ function UpdateCustomer(props: any) {
     const customerId = Number(id);
     const selectedCustomer = props.customers.find((c: any) => c.id === customerId);
     const [customer, setCustomer] = useState(selectedCustomer || {id: customerId, name: '', email: '', password: ''});
+    const cancel = () => {
+        navigate('/');
+    }
 
     useEffect(() => {
         if (selectedCustomer) {
@@ -62,6 +65,7 @@ function UpdateCustomer(props: any) {
                 </div>
                 <button type="submit">Update Customer</button>
             </form>
+            <button onClick={cancel}>Cancel</button>
         </div>
     )
 }

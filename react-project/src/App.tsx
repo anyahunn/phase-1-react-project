@@ -4,6 +4,7 @@ import './App.css';
 import DisplayCustomers from './components/DisplayCustomers';
 import AddCustomer from './components/AddCustomer';
 import DeleteCustomer from './components/DeleteCustomer';
+import UpdateCustomer from './components/UpdateCustomer';
 
 function App() {
   const [customers, setCustomers] = useState([
@@ -16,6 +17,12 @@ function App() {
     setCustomers(prev => [...prev, newCustomer]);
   };
 
+  const updateCustomer = (updatedCustomer:any) => {
+    setCustomers(prev =>
+      prev.map(c => c.id === updatedCustomer.id ? updatedCustomer : c)
+    );
+  };
+
   return (
     <Router>
       <div className="App">
@@ -23,6 +30,7 @@ function App() {
           <Route path="/" element={<DisplayCustomers customers={customers} customer={null} />} />
           <Route path="/add_customer/:id" element={<AddCustomer id={customers.length} addCustomer={addCustomer} />} />
           <Route path="/delete_customer/:id" element={<DeleteCustomer />} />
+          <Route path="/update_customer/:id" element={<UpdateCustomer customers={customers} updateCustomer={updateCustomer} />} />
         </Routes>
       </div>
     </Router>

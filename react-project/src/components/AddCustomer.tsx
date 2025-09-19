@@ -5,6 +5,9 @@ function AddCustomer(props: any) {
     const {id} = useParams();
     const [customer, setCustomer] = useState({id:id, name:"", email:"", password:""});
     const navigate = useNavigate();
+    const cancel = () => {
+        navigate('/');
+    };
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         // Generate a new id if needed
@@ -66,6 +69,7 @@ function AddCustomer(props: any) {
 
                 <button type="submit">Add Customer</button>
             </form>
+            <button onClick={cancel}>Cancel</button>
         </div>
     )
 }

@@ -79,18 +79,18 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
 			<button
 				className="delete-customer-btn"
 				onClick={() => {
-					if (selectedCustomer) {
-                        console.log(customers.length);
+					if (selectedCustomer != -1) {
+                        console.log(selectedCustomer);
 						navigate(`/delete_customer/${selectedCustomer}`);
 					} else {
                         console.log(customers.length);
 					}
 				}}
-				disabled={!selectedCustomer}
+				disabled={selectedCustomer == -1}
 				style={{
-                    backgroundColor: !selectedCustomer ? '#ccc' : '',
-                    cursor: !selectedCustomer ? 'not-allowed' : 'pointer'
-                }}
+					backgroundColor: selectedCustomer == -1 ? '#ccc' : '',
+					cursor: selectedCustomer == -1 ? 'not-allowed' : 'pointer'
+				}}
 			>
 				{buttonText2}
 			</button>

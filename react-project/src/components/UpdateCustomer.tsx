@@ -37,6 +37,7 @@ function UpdateCustomer(props: any) {
                 <div>
                     <label htmlFor="name">Name:</label>
                     <input
+                        data-testid="name-input"
                         type="text"
                         id="name"
                         placeholder="Enter your name"
@@ -47,6 +48,7 @@ function UpdateCustomer(props: any) {
                 <div>
                     <label htmlFor="email">Email:</label>
                     <input
+                        data-testid="email-input"
                         type="text"
                         id="email"
                         placeholder="Enter your email"
@@ -57,6 +59,7 @@ function UpdateCustomer(props: any) {
                 <div>
                     <label htmlFor="password">Password:</label>
                     <input
+                        data-testid="password-input"
                         type="text"
                         id="Password"
                         placeholder="Enter your password"

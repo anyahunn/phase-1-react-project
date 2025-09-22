@@ -4,8 +4,9 @@ import '@testing-library/jest-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
 import DisplayCustomers from './DisplayCustomers';
 import React from 'react';
+import { beforeAll, describe, expect, test } from 'vitest';
 
-let mockCustomers; 
+let mockCustomers: string | any[]; 
 
 describe('DisplayCustomers Component', () => {
     beforeAll(() => {

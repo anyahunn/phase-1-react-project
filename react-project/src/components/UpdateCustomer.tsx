@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import * as memdb from '../../../ProjectAssets/memdb.js';
 import './UpdateCustomer.css';
 
 function UpdateCustomer() {
@@ -9,10 +8,12 @@ function UpdateCustomer() {
     const [customer, setCustomer] = useState({ id: Number(id), name: '', email: '', password: '' });
 
     useEffect(() => {
-        const existingCustomer = memdb.get(Number(id));
-        if (existingCustomer) {
-            setCustomer({ id: existingCustomer.id, name: existingCustomer.name, email: existingCustomer.email, password: existingCustomer.password });
-        }
+        // Fetch customer from REST server
+        fetch(`http://localhost:4000/customers/${id}`)
+            .then(res => res.json())
+            .then(data => {
+                setCustomer({ id: data.id, name: data.name, email: data.email, password: data.password });
+            });
     }, [id]);
 
     const cancel = () => {
@@ -21,14 +22,15 @@ function UpdateCustomer() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const updatedCustomer = {
-            id: Number(id),
-            name: customer.name,
-            email: customer.email,
-            password: customer.password
-        };
-        memdb.put(Number(updatedCustomer.id), updatedCustomer);
-        navigate('/');
+        // Update customer on REST server
+        fetch(`http://localhost:4000/customers/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(customer)
+        })
+        .then(() => navigate('/'));
     };
 
     return (

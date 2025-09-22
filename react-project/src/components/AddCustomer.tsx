@@ -32,7 +32,7 @@ function AddCustomer() {
                         className="input"
                         type="text"
                         id="name"
-                        placeholder="Enter your name"
+                        placeholder="Name"
                         value={customer.name}
                         onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
                         required
@@ -44,7 +44,7 @@ function AddCustomer() {
                         className="input"
                         type="email"
                         id="email"
-                        placeholder="Enter your email"
+                        placeholder="Email"
                         value={customer.email}
                         onChange={(e) => setCustomer({ ...customer, email: e.target.value })}
                         required
@@ -56,7 +56,7 @@ function AddCustomer() {
                         className="input"
                         type="password"
                         id="password"
-                        placeholder="Enter your password"
+                        placeholder="Password"
                         value={customer.password}
                         onChange={(e) => setCustomer({ ...customer, password: e.target.value })}
                         required

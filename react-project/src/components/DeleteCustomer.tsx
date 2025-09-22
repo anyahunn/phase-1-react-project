@@ -1,16 +1,19 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import * as memdb from '../../../ProjectAssets/memdb.js';
 
-function DeleteCustomer(props: any) {
-    const { customers, deleteCustomer } = props;
+function DeleteCustomer() {
     const navigate = useNavigate();
     const { id } = useParams();
-
     const customerId = Number(id);
-    const customer = customers.find((c: any) => c.id === customerId);
+    const [customer, setCustomer] = useState<any>(null);
+
+    useEffect(()=> {
+        setCustomer(memdb.get(customerId));
+    }, [customerId]);
 
     const handleDelete = () => {
-        deleteCustomer(customerId);
+        memdb.deleteById(customerId);
         navigate('/'); // Go back to DisplayCustomers
     };
 
@@ -24,27 +27,28 @@ function DeleteCustomer(props: any) {
     }
 
     return (
-        <div>
-            <h2>Delete Customer</h2>
-            <div style={{ marginBottom: '1em', border: '1px solid #ccc', padding: '0.5em', borderRadius: '4px' }}>
-                <div>
-                    <strong>Name:</strong> {customer.name}
-                </div>
-                <div>
-                    <strong>Email:</strong> {customer.email}
-                </div>
-                <div>
-                    <strong>Password:</strong> {customer.password}
-                </div>
-                <button onClick={handleDelete} style={{ marginTop: '0.5em' }}>
-                    Confirm Delete
-                </button>
-                <button onClick={() => navigate('/')} style={{ marginLeft: '0.5em' }}>
-                    Cancel
-                </button>
+        <div className="container">
+          <h2 className="title">Delete Customer</h2>
+          <div className="customer-details">
+            <div className="form-group">
+              <span className="label"><strong>Name:</strong></span>
+              <span className="text">{customer.name}</span>
             </div>
+            <div className="form-group">
+              <span className="label"><strong>Email:</strong></span>
+              <span className="text">{customer.email}</span>
+            </div>
+            <div className="form-group">
+              <span className="label"><strong>Password:</strong></span>
+              <span className="text">{customer.password}</span>
+            </div>
+            <div className="button-group">
+              <button className="button" onClick={handleDelete}>Confirm Delete</button>
+              <button className="button cancel" onClick={() => navigate('/')}>Cancel</button>
+            </div>
+          </div>
         </div>
-    );
+      );
 }
 
 export default DeleteCustomer;

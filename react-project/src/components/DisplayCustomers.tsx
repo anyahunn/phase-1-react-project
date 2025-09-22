@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getAll } from '../../../ProjectAssets/memdb.js';
+//import { getAll } from '../../../ProjectAssets/memdb.js';
 import './DisplayCustomers.css';
 
 interface Customer {
@@ -17,18 +17,18 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
     const buttonText = selectedCustomer != -1 ? "Update Customer" : "Add Customer";
 	const buttonText2 = "Delete Customer";
     //Dont use this until v3 
-	// useEffect(() => {
-	// 	fetch('http://localhost:4000/customers')
-	// 		.then((res) => res.json())
-	// 		.then((data) => setCustomers(data))
-	// 		.catch((err) => console.error('Failed to fetch customers:', err));
-	// }, []);
+	useEffect(() => {
+		fetch('http://localhost:4000/customers')
+			.then((res) => res.json())
+			.then((data) => setCustomers(data))
+			.catch((err) => console.error('Failed to fetch customers:', err));
+	}, []);
 
-    //Dont use until v2
-    useEffect(() => {
-        const data = getAll('customers') as Customer[];
-        setCustomers(data);
-    }, []);
+    // //Dont use until v2
+    // useEffect(() => {
+    //     const data = getAll('customers') as Customer[];
+    //     setCustomers(data);
+    // }, []);
 
 	return (
 		<div>

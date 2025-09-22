@@ -24,7 +24,7 @@ function AddCustomer(props: any) {
     return(
         <div className='page'>
             <h2 className="add-customer-title">Add Customer</h2>
-            <form onSubmit={handleSubmit} className="add-customer-form">
+            <form onSubmit={handleSubmit} className="add-customer-form" data-testid="add-customer-form">
                 <div>
                     {/* <label htmlFor="id">ID:</label>
                     <input
@@ -39,6 +39,7 @@ function AddCustomer(props: any) {
                 <div>
                     <label htmlFor="name">Name:</label>
                     <input
+                        data-testid="name-input"
                         type="text"
                         id="name"
                         placeholder="Enter your name"
@@ -50,6 +51,7 @@ function AddCustomer(props: any) {
 
                     <label htmlFor="email">Email:</label>
                     <input
+                        data-testid="email-input"
                         type="text"
                         id="email"
                         placeholder="Enter your email"
@@ -60,6 +62,7 @@ function AddCustomer(props: any) {
                 <div>
                     <label htmlFor="password">Password:</label>
                     <input
+                        data-testid="password-input"
                         type="text"
                         id="Password"
                         placeholder="Enter your password"

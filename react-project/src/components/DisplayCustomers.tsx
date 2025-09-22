@@ -39,7 +39,7 @@ const DisplayCustomers: React.FC<{ customers: Customer[], customer: Customer | n
 	return (
 		<div>
 			<h2 className="customer-list-title">Customer List</h2>
-			<table className="customer-table">
+			<table className="customer-table" data-testid="customer-table">
 				<thead>
 					<tr>
 						<th>ID</th>
@@ -52,7 +52,7 @@ const DisplayCustomers: React.FC<{ customers: Customer[], customer: Customer | n
 					{customers.map((customer) => {
 						const isSelected = selectedCustomer === customer.id;
 						return (
-							<tr
+							<tr data-testid={`customer-row-${customer.id}`}
 								key={customer.id}
 								className={isSelected ? 'selected-row' : ''}
 								onClick={() => setSelectedCustomer(isSelected ? null : customer.id)}
@@ -86,10 +86,7 @@ const DisplayCustomers: React.FC<{ customers: Customer[], customer: Customer | n
 				className="delete-customer-btn"
 				onClick={() => {
 					if (selectedCustomer) {
-                        console.log(customers.length);
 						navigate(`/delete_customer/${selectedCustomer}`);
-					} else {
-                        console.log(customers.length);
 					}
 				}}
 				disabled={!selectedCustomer}

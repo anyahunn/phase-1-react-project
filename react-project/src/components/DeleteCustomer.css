@@ -1,20 +1,23 @@
 .container {
+    color:black;
     max-width: 600px;
     margin: 40px auto;
     padding: 24px;
     background: #f5f8fa; /* Changed to a light blue-gray */
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    
   }
   
   .title {
     font-size: 2rem;
     font-weight: 600;
     margin-bottom: 24px;
-    color: #222; /* Darker text for contrast */
+    color: #000000; /* Darker text for contrast */
   }
   
-  .customer-details {
+  .delete-customer-details {
+    color: #000000;
     margin-bottom: 1em;
     border: 1px solid #eee;
     padding: 1em;
@@ -22,6 +25,7 @@
     background: #fff; /* White background for details */
   }
   
+
   .form-group {
     margin-bottom: 18px;
   }
@@ -30,7 +34,7 @@
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
-    color: #7404a0; /* Blue label for contrast */
+    color: #000000; /* Blue label for contrast */
   }
   
   .text {
@@ -69,3 +73,4 @@
   .button.cancel:hover {
     background: #ccc;
   }
+  

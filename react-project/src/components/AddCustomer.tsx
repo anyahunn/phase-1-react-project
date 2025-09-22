@@ -71,7 +71,7 @@ function AddCustomer(props: any) {
                     />
                 </div>
 
-                <button type="submit">Add Customer</button>
+                <button type="submit" data-testid="add-customer-submit">Add Customer</button>
             </form>
             <button className="cancel-button" onClick={cancel}>Cancel</button>
         </div>

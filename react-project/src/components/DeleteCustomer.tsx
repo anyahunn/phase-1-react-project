@@ -36,7 +36,7 @@ function DeleteCustomer(props: any) {
                 <div>
                     <strong>Password:</strong> {customer.password}
                 </div>
-                <button onClick={handleDelete} style={{ marginTop: '0.5em' }}>
+                <button onClick={handleDelete} style={{ marginTop: '0.5em' }} data-testid="confirm-delete-button">
                     Confirm Delete
                 </button>
                 <button onClick={() => navigate('/')} style={{ marginLeft: '0.5em' }}>

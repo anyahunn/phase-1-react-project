@@ -1,27 +1,24 @@
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import * as memdb from '../../../ProjectAssets/memdb.js';
+import { useNavigate } from 'react-router-dom';
 import './AddCustomer.css';
 
 function AddCustomer() {
-    const { id } = useParams();
-    const [customer, setCustomer] = useState({ id: id, name: "", email: "", password: "" });
+    const [customer, setCustomer] = useState({name: "", email: "", password: "" });
     const navigate = useNavigate();
     const cancel = () => {
         navigate('/');
     };
-    const handleSubmit = (e: React.FormEvent) => {
+    
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Generate a new id if needed
-        const newCustomer = {
-            id: Number(id), // or use a better id logic
-            name: customer.name,
-            email: customer.email,
-            password: customer.password
-        };
-        memdb.post(newCustomer);
-        navigate('/'); // or '/displayCustomers' if that's your route
+        await fetch('http://localhost:4000/customers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(customer),
+        });
+        navigate('/');
     };
+
     return (
         <div className='container'>
             <h2 className="add-customer-title">Add Customer</h2>

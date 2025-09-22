@@ -1,30 +1,30 @@
 import React, {useEffect, useState} from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import * as memdb from '../../../ProjectAssets/memdb.js';
 import './DeleteCustomer.css';
 
 function DeleteCustomer() {
     const navigate = useNavigate();
     const { id } = useParams();
-    const customerId = Number(id);
     const [customer, setCustomer] = useState<any>(null);
 
-    useEffect(()=> {
-        setCustomer(memdb.get(customerId));
-    }, [customerId]);
+    useEffect(() => {
+      fetch(`http://localhost:4000/customers/${id}`)
+        .then(res => res.json())
+        .then(data => setCustomer(data));
+    }, [id]);
 
-    const handleDelete = () => {
-        memdb.deleteById(customerId);
-        navigate('/'); // Go back to DisplayCustomers
+    const handleDelete = async () => {
+      await fetch(`http://localhost:4000/customers/${id}`, { method: 'DELETE' });
+      navigate('/');
     };
 
     if (!customer) {
-        return (
-            <div>
-                <h2>Customer not found</h2>
-                <button onClick={() => navigate('/')}>Back</button>
-            </div>
-        );
+      return (
+        <div className="container">
+          <h2 className="title">Customer not found</h2>
+          <button className="button" onClick={() => navigate('/')}>Back</button>
+        </div>
+      );
     }
 
     return (

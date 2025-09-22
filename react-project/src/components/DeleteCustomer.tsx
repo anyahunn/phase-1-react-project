@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import * as memdb from '../../../ProjectAssets/memdb.js';
+import './DeleteCustomer.css';
 
 function DeleteCustomer() {
     const navigate = useNavigate();
@@ -29,7 +30,7 @@ function DeleteCustomer() {
     return (
         <div className="container">
           <h2 className="title">Delete Customer</h2>
-          <div className="customer-details">
+          <div className="delete-customer-details">
             <div className="form-group">
               <span className="label"><strong>Name:</strong></span>
               <span className="text">{customer.name}</span>

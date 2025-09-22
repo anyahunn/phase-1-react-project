@@ -10,11 +10,11 @@ interface Customer {
 	password: string;
 }
 
-const DisplayCustomers: React.FC<{ customers: Customer[], customer: Customer | null }> = ({ customers, customer }) => {
+const DisplayCustomers: React.FC<{}> = ({}) => {
 	const navigate = useNavigate();
-	//const [customers, setCustomers] = useState<Customer[]>([]); Use for v2 and v3
-	const [selectedCustomer, setSelectedCustomer] = useState<number | null>(null);
-    const buttonText = selectedCustomer ? "Update Customer" : "Add Customer";
+	const [customers, setCustomers] = useState<Customer[]>([]); //Use for v2 and v3
+	const [selectedCustomer, setSelectedCustomer] = useState<number | -1>(-1);
+    const buttonText = selectedCustomer != -1 ? "Update Customer" : "Add Customer";
 	const buttonText2 = "Delete Customer";
     //Dont use this until v3 
 	// useEffect(() => {
@@ -25,16 +25,10 @@ const DisplayCustomers: React.FC<{ customers: Customer[], customer: Customer | n
 	// }, []);
 
     //Dont use until v2
-    // useEffect(() => {
-    //     const data = getAll('customers') as Customer[];
-    //     setCustomers(data);
-    // }, []);
-
-    // useEffect(() => {
-    //     if (customer){
-    //         customers = [...customers, customer];
-    //     }
-    // })
+    useEffect(() => {
+        const data = getAll('customers') as Customer[];
+        setCustomers(data);
+    }, []);
 
 	return (
 		<div>
@@ -55,7 +49,7 @@ const DisplayCustomers: React.FC<{ customers: Customer[], customer: Customer | n
 							<tr
 								key={customer.id}
 								className={isSelected ? 'selected-row' : ''}
-								onClick={() => setSelectedCustomer(isSelected ? null : customer.id)}
+								onClick={() => setSelectedCustomer(isSelected ? -1 : customer.id)}
 							>
 								<td>{customer.id}</td>
 								<td>{customer.name}</td>
@@ -70,7 +64,7 @@ const DisplayCustomers: React.FC<{ customers: Customer[], customer: Customer | n
 			<button
 				className="add-customer-btn"
 				onClick={() => {
-					if (selectedCustomer) {
+					if (selectedCustomer != -1) {
                         console.log(customers.length);
 						navigate(`/update_customer/${selectedCustomer}`);
 					} else {

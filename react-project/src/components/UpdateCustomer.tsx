@@ -33,7 +33,7 @@ function UpdateCustomer(props: any) {
     return(
         <div className='page'>
             <h2 className='update-customer-title'>Update Customer</h2>
-            <form onSubmit={handleSubmit} className="update-customer-form">
+            <form onSubmit={handleSubmit} className="update-customer-form" data-testid="update-customer-form">
                 <div>
                     <label htmlFor="name">Name:</label>
                     <input
@@ -67,7 +67,7 @@ function UpdateCustomer(props: any) {
                         onChange={(e) => setCustomer({...customer, password: e.target.value})}
                     />
                 </div>
-                <button type="submit">Update Customer</button>
+                <button type="submit" data-testid='submit-button'>Update Customer</button>
             </form>
             <button className='cancel-button' onClick={cancel}>Cancel</button>
         </div>

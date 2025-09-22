@@ -1,4 +1,4 @@
-.button {
+.submit-button {
   margin: 20px auto;
   display: block;
   padding: 10px 20px;
@@ -9,18 +9,20 @@
   cursor: pointer;
   transition: background 0.2s;
 }
-.button:hover {
+.submit-button:hover {
   background: #5548c8;
 }
 
 /* Center the form and add shadow */
 .update-customer-form {
+  color:black;
   width: 400px;
   margin: 40px auto;
   padding: 24px;
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  
 }
 
 .update-customer-form label {
@@ -28,15 +30,18 @@
   margin-bottom: 8px;
   color: #6c63ff;
   font-weight: 500;
+  color:black;
 }
 
 .update-customer-form input {
+  color: black;
   width: 100%;
   padding: 8px;
   margin-bottom: 16px;
   border: 1px solid #ddd;
   border-radius: 6px;
   background: #f9f9f9;
+  
 }
 
 .update-customer-form button {

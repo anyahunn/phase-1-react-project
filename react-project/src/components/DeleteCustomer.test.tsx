@@ -2,38 +2,54 @@ import './DeleteCustomer.tsx';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { BrowserRouter as Router,  MemoryRouter, Route, Routes} from 'react-router-dom';
-import DisplayCustomers from './DisplayCustomers';
 import React from 'react';
 import DeleteCustomer from './DeleteCustomer.tsx';
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test, vi, beforeEach } from 'vitest';
+
+
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async () => {
+    const actual = await vi.importActual('react-router-dom');
+    return {
+        ...actual,
+        useNavigate: () => mockNavigate,
+    };
+});
 
 const mockCustomers = [
             { id: 1, name: 'John Doe', email: 'john@example.com', password: 'password123' },
             { id: 2, name: 'Jane Smith', email: 'jane@example.com', password: 'password456' }
         ];
 const mockDeleteCustomer = vi.fn();
-const mockId = 1;
 
 describe('DeleteCustomer Component', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
     test('renders delete customer confirmation with selected customer data', () => {
-        const selectedCustomer = mockCustomers.find(c => c.id === mockId);
         render(
-            <MemoryRouter initialEntries={[`/delete/${mockId}`]}>
+            <MemoryRouter initialEntries={[`/delete_customer/1`]}>
                 <Routes>
-                    <Route path="/delete/:id" element={
+                    <Route path="/delete_customer/:id" element={
                         <DeleteCustomer customers={mockCustomers} deleteCustomer={mockDeleteCustomer} />
                     } />
                 </Routes>
             </MemoryRouter>
         );
+        expect(screen.getByText(/Delete Customer/i)).toBeInTheDocument();
+        expect(screen.getByText('John Doe')).toBeInTheDocument();
+        expect(screen.getByText('john@example.com')).toBeInTheDocument();
+        expect(screen.getByText('password123')).toBeInTheDocument();
         expect(screen.getByText(/Confirm Delete/i)).toBeInTheDocument();
-        expect(screen.getByText(selectedCustomer.name)).toBeInTheDocument();
+        expect(screen.getByText(/Cancel/i)).toBeInTheDocument();
     });
-    test('cancels delete when you press cancel button', () => {
+
+    test('cancels delete and navigates back when cancel button is clicked', () => {
         render(
-            <MemoryRouter initialEntries={[`/delete/${mockId}`]}>
+            <MemoryRouter initialEntries={[`/delete_customer/1`]}>
                 <Routes>
-                    <Route path="/delete/:id" element={
+                    <Route path="/delete_customer/:id" element={
                         <DeleteCustomer customers={mockCustomers} deleteCustomer={mockDeleteCustomer} />
                     } />
                 </Routes>
@@ -41,32 +57,82 @@ describe('DeleteCustomer Component', () => {
         );
         const cancelButton = screen.getByText(/Cancel/i);
         fireEvent.click(cancelButton);
-        expect(window.location.pathname).toBe('/');
+        expect(mockNavigate).toHaveBeenCalledWith('/');
     });
-    test('deletes customer when you press confirm delete button', () => {
+
+    test('deletes customer and navigates back when confirm delete button is clicked', () => {
         render(
-            <MemoryRouter initialEntries={[`/delete/${mockId}`]}>
+            <MemoryRouter initialEntries={[`/delete_customer/1`]}>
                 <Routes>
-                    <Route path="/delete/:id" element={
+                    <Route path="/delete_customer/:id" element={
                         <DeleteCustomer customers={mockCustomers} deleteCustomer={mockDeleteCustomer} />
                     } />
                 </Routes>
             </MemoryRouter>
         );
-        const confirmButton = screen.getByText(/Confirm Delete/i);
+        const confirmButton = screen.getByTestId('confirm-delete-button');
         fireEvent.click(confirmButton);
-        expect(mockDeleteCustomer).toHaveBeenCalledWith(mockId);
+        expect(mockDeleteCustomer).toHaveBeenCalledWith(1);
+        expect(mockNavigate).toHaveBeenCalledWith('/');
     });
+
     test('shows customer not found message for invalid id', () => {
         render(
-            <MemoryRouter initialEntries={[`/delete/999`]}>
+            <MemoryRouter initialEntries={[`/delete_customer/999`]}>
                 <Routes>
-                    <Route path="/delete/:id" element={
+                    <Route path="/delete_customer/:id" element={
                         <DeleteCustomer customers={mockCustomers} deleteCustomer={mockDeleteCustomer} />
                     } />
                 </Routes>
             </MemoryRouter>
         );
+        expect(screen.getByText(/Customer not found/i)).toBeInTheDocument();
+        expect(screen.getByText(/Back/i)).toBeInTheDocument();
+    });
+
+    test('navigates back when back button is clicked in customer not found case', () => {
+        render(
+            <MemoryRouter initialEntries={[`/delete_customer/999`]}>
+                <Routes>
+                    <Route path="/delete_customer/:id" element={
+                        <DeleteCustomer customers={mockCustomers} deleteCustomer={mockDeleteCustomer} />
+                    } />
+                </Routes>
+            </MemoryRouter>
+        );
+        const backButton = screen.getByText(/Back/i);
+        fireEvent.click(backButton);
+        expect(mockNavigate).toHaveBeenCalledWith('/');
+    });
+
+    test('handles string id parameter conversion to number', () => {
+        render(
+            <MemoryRouter initialEntries={[`/delete_customer/2`]}>
+                <Routes>
+                    <Route path="/delete_customer/:id" element={
+                        <DeleteCustomer customers={mockCustomers} deleteCustomer={mockDeleteCustomer} />
+                    } />
+                </Routes>
+            </MemoryRouter>
+        );
+        expect(screen.getByText('Jane Smith')).toBeInTheDocument();
+        
+        const confirmButton = screen.getByTestId('confirm-delete-button');
+        fireEvent.click(confirmButton);
+        expect(mockDeleteCustomer).toHaveBeenCalledWith(2); 
+    });
+
+    test('handles non-numeric id parameter', () => {
+        render(
+            <MemoryRouter initialEntries={[`/delete_customer/abc`]}>
+                <Routes>
+                    <Route path="/delete_customer/:id" element={
+                        <DeleteCustomer customers={mockCustomers} deleteCustomer={mockDeleteCustomer} />
+                    } />
+                </Routes>
+            </MemoryRouter>
+        );
+        
         expect(screen.getByText(/Customer not found/i)).toBeInTheDocument();
     });
 });

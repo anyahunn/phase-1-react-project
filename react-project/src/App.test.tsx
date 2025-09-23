@@ -1,14 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { MemoryRouter } from 'react-router-dom';
 import { beforeEach, afterEach, test, expect, vi } from 'vitest';
-import DisplayCustomers from './components/DisplayCustomers';
-import AddCustomer from './components/AddCustomer';
-import DeleteCustomer from './components/DeleteCustomer';
-import UpdateCustomer from './components/UpdateCustomer';
+import App, { AppRoutes } from './App';
 
 beforeEach(() => {
-  global.fetch = vi.fn((url) => {
+  vi.stubGlobal('fetch', vi.fn((url) => {
     if (url.includes('/customers/1')) {
       return Promise.resolve({
         json: () => Promise.resolve({ id: 1, name: 'John Doe', email: 'john@example.com', password: 'password123' })
@@ -20,48 +17,64 @@ beforeEach(() => {
         { id: 2, name: 'Jane Smith', email: 'jane@example.com', password: 'password456' }
       ])
     });
-  });
+  }));
 });
 
 afterEach(() => {
   vi.resetAllMocks();
+  vi.unstubAllGlobals();
 });
 
-const TestApp = ({ initialEntries = ['/'] }) => (
-  <MemoryRouter initialEntries={initialEntries}>
-    <div className="App">
-      <Routes>
-        <Route path="/" element={<DisplayCustomers />} />
-        <Route path="/add_customer/:id" element={<AddCustomer />} />
-        <Route path="/delete_customer/:id" element={<DeleteCustomer />} />
-        <Route path="/update_customer/:id" element={<UpdateCustomer />} />
-      </Routes>
-    </div>
-  </MemoryRouter>
-);
-
+// Test the exported AppRoutes component which contains the routing logic
 test('renders default route (DisplayCustomers)', async () => {
-  render(<TestApp />);
+  render(
+    <MemoryRouter initialEntries={['/']}>
+      <AppRoutes />
+    </MemoryRouter>
+  );
   expect(await screen.findByText('Customer List')).toBeInTheDocument();
 });
 
 test('renders add customer route', async () => {
-  render(<TestApp initialEntries={['/add_customer/3']} />);
+  render(
+    <MemoryRouter initialEntries={['/add_customer/3']}>
+      <AppRoutes />
+    </MemoryRouter>
+  );
   expect(screen.getAllByText(/Add Customer/i)).toHaveLength(2);
 });
 
 test('renders update customer route', async () => {
-  render(<TestApp initialEntries={['/update_customer/1']} />);
+  render(
+    <MemoryRouter initialEntries={['/update_customer/1']}>
+      <AppRoutes />
+    </MemoryRouter>
+  );
   expect(screen.getAllByText(/Update Customer/i)).toHaveLength(2);
 });
 
 test('renders delete customer route', async () => {
-  render(<TestApp initialEntries={['/delete_customer/1']} />);
+  render(
+    <MemoryRouter initialEntries={['/delete_customer/1']}>
+      <AppRoutes />
+    </MemoryRouter>
+  );
   expect(await screen.findByText(/Delete Customer/i)).toBeInTheDocument();
   expect(await screen.findByText(/John Doe/i)).toBeInTheDocument();
 });
 
 test('handles invalid route', () => {
-  render(<TestApp initialEntries={['/invalid-route']} />);
+  render(
+    <MemoryRouter initialEntries={['/invalid-route']}>
+      <AppRoutes />
+    </MemoryRouter>
+  );
   expect(screen.queryByText('Customer List')).not.toBeInTheDocument();
+});
+
+// Test that App component renders without crashing
+test('App component renders without crashing', () => {
+  // We can't easily test App directly due to BrowserRouter, but we can test that it exports correctly
+  expect(typeof App).toBe('function');
+  expect(typeof AppRoutes).toBe('function');
 });

@@ -24,12 +24,6 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
 			.catch((err) => console.error('Failed to fetch customers:', err));
 	}, []);
 
-    // //Dont use until v2
-    // useEffect(() => {
-    //     const data = getAll('customers') as Customer[];
-    //     setCustomers(data);
-    // }, []);
-
 	return (
 		<div>
 			<h2 className="customer-list-title">Customer List</h2>
@@ -49,7 +43,8 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
 							<tr
 								key={customer.id}
 								className={isSelected ? 'selected-row' : ''}
-								onClick={() => setSelectedCustomer(isSelected ? -1 : customer.id)}
+								data-testid={`customer-row-${customer.id}`}
+                                onClick={() => setSelectedCustomer(isSelected ? -1 : customer.id)}
 							>
 								<td>{customer.id}</td>
 								<td>{customer.name}</td>
@@ -63,6 +58,7 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
             
 			<button
 				className="add-customer-btn"
+                data-testid="add-customer-btn"
 				onClick={() => {
 					if (selectedCustomer != -1) {
                         console.log(customers.length);
@@ -78,13 +74,13 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
 
 			<button
 				className="delete-customer-btn"
+                data-testid="delete-customer-btn"
 				onClick={() => {
 					if (selectedCustomer != -1) {
                         console.log(selectedCustomer);
 						navigate(`/delete_customer/${selectedCustomer}`);
-					} else {
-                        console.log(customers.length);
-					}
+					} 
+					
 				}}
 				disabled={selectedCustomer == -1}
 				style={{

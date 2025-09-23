@@ -21,7 +21,7 @@ function AddCustomer() {
 
     return (
         <div className='container'>
-            <h2 className="add-customer-title">Add Customer</h2>
+            <h2 data-testid="add-customer-title" className="add-customer-title">Add Customer</h2>
             <form onSubmit={handleSubmit} className="add-customer-form">
                 <div className="form-group">
                     <label className="label" htmlFor="name">Name:</label>

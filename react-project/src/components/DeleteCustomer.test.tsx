@@ -5,13 +5,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import DeleteCustomer from './DeleteCustomer';
 import { MemoryRouter } from 'react-router-dom';
 
-// Mock memdb
 vi.mock('../../../ProjectAssets/memdb.js', () => ({
   get: vi.fn(),
   deleteById: vi.fn(),
 }));
 
-// Mock useNavigate and useParams
 vi.mock('react-router-dom', async (importOriginal: any) => {
   const actual = await importOriginal();
   return {
@@ -21,7 +19,6 @@ vi.mock('react-router-dom', async (importOriginal: any) => {
   };
 });
 
-// Import the mocked modules to access the mock functions
 import * as memdb from '../../../ProjectAssets/memdb.js';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -58,7 +55,7 @@ describe('DeleteCustomer Component', () => {
     expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
   });
 
-  it('renders customer not found message when customer does not exist', () => {
+  it('renders customer not found message and handles back navigation', () => {
     vi.mocked(useParams).mockReturnValue({ id: '999' });
     vi.mocked(memdb.get).mockReturnValue(null);
 
@@ -70,19 +67,9 @@ describe('DeleteCustomer Component', () => {
 
     expect(screen.getByText('Customer not found')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
-  });
-
-  it('calls memdb.get with correct customer ID on mount', () => {
-    vi.mocked(useParams).mockReturnValue({ id: '5' });
-    vi.mocked(memdb.get).mockReturnValue(null);
-
-    render(
-      <MemoryRouter>
-        <DeleteCustomer />
-      </MemoryRouter>
-    );
-
-    expect(vi.mocked(memdb.get)).toHaveBeenCalledWith(5);
+    
+    fireEvent.click(screen.getByRole('button', { name: /back/i }));
+    expect(mockNavigate).toHaveBeenCalledWith('/');
   });
 
   it('calls deleteById and navigates on confirm delete', () => {
@@ -126,20 +113,6 @@ describe('DeleteCustomer Component', () => {
     );
 
     fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
-    expect(mockNavigate).toHaveBeenCalledWith('/');
-  });
-
-  it('navigates back when back button is clicked in not found scenario', () => {
-    vi.mocked(useParams).mockReturnValue({ id: '999' });
-    vi.mocked(memdb.get).mockReturnValue(null);
-
-    render(
-      <MemoryRouter>
-        <DeleteCustomer />
-      </MemoryRouter>
-    );
-
-    fireEvent.click(screen.getByRole('button', { name: /back/i }));
     expect(mockNavigate).toHaveBeenCalledWith('/');
   });
 

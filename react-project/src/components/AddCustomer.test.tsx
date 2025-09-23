@@ -5,12 +5,10 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import AddCustomer from './AddCustomer';
 import { MemoryRouter } from 'react-router-dom';
 
-// Mock memdb
 vi.mock('../../../ProjectAssets/memdb.js', () => ({
   post: vi.fn(),
 }));
 
-// Mock useNavigate
 const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async (importOriginal: any) => {
   const actual = await importOriginal();
@@ -21,7 +19,6 @@ vi.mock('react-router-dom', async (importOriginal: any) => {
   };
 });
 
-// Import the mocked module to access the mock function
 import * as memdb from '../../../ProjectAssets/memdb.js';
 
 describe('AddCustomer Component', () => {
@@ -31,25 +28,19 @@ describe('AddCustomer Component', () => {
     vi.mocked(memdb.post).mockReset();
   });
 
-  it('renders the form and cancel button', () => {
+  it('renders form fields and handles input changes', () => {
     render(
       <MemoryRouter>
         <AddCustomer />
       </MemoryRouter>
     );
+    
     expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /add customer/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
-  });
-
-  it('allows user to type in all fields', () => {
-    render(
-      <MemoryRouter>
-        <AddCustomer />
-      </MemoryRouter>
-    );
+    
     fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Dana' } });
     fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'dana@example.com' } });
     fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'p@ss4' } });

@@ -488,3 +488,76 @@ describe('App Component - Full Application Tests', () => {
     });
   });
 });
+
+// NEW: App Component Coverage Tests
+import App, { AppRoutes } from './App';
+
+describe('App Component Coverage Tests', () => {
+  const mockCustomers = [
+    { id: 1, name: 'John Doe', email: 'john@example.com', password: 'password123' },
+    { id: 2, name: 'Jane Smith', email: 'jane@example.com', password: 'password456' },
+    { id: 3, name: 'Alice Johnson', email: 'alice@example.com', password: 'password789' }
+  ];
+  const mockNavigate = vi.fn();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(getAll).mockReturnValue(mockCustomers);
+    vi.mocked(useNavigate).mockReturnValue(mockNavigate);
+  });
+
+  it('should render AppRoutes component from App.tsx', () => {
+    render(
+      <MemoryRouter initialEntries={['/']}>
+        <AppRoutes />
+      </MemoryRouter>
+    );
+    
+    // Test that the default route renders DisplayCustomers
+    expect(screen.getByText('Customer List')).toBeInTheDocument();
+  });
+
+  it('should test App component exports and structure', () => {
+    // Test that App exports correctly and is a function component
+    expect(typeof App).toBe('function');
+    expect(typeof AppRoutes).toBe('function');
+    
+    // Test that components can be instantiated
+    const app = React.createElement(App);
+    const appRoutes = React.createElement(AppRoutes);
+    expect(app).toBeDefined();
+    expect(appRoutes).toBeDefined();
+  });
+
+  it('should test AppRoutes with different routes', () => {
+    // Test add customer route
+    render(
+      <MemoryRouter initialEntries={['/add_customer/4']}>
+        <AppRoutes />
+      </MemoryRouter>
+    );
+    expect(screen.getAllByText(/Add Customer/)).toHaveLength(2);
+  });
+
+  it('should test update customer route through AppRoutes', () => {
+    vi.mocked(get).mockReturnValue({ id: 1, name: 'John Doe', email: 'john@example.com', password: 'password123' });
+    
+    render(
+      <MemoryRouter initialEntries={['/update_customer/1']}>
+        <AppRoutes />
+      </MemoryRouter>
+    );
+    expect(screen.getAllByText(/Update Customer/)).toHaveLength(2);
+  });
+
+  it('should test delete customer route through AppRoutes', () => {
+    vi.mocked(get).mockReturnValue({ id: 1, name: 'John Doe', email: 'john@example.com', password: 'password123' });
+    
+    render(
+      <MemoryRouter initialEntries={['/delete_customer/1']}>
+        <AppRoutes />
+      </MemoryRouter>
+    );
+    expect(screen.getByText(/Delete Customer/)).toBeInTheDocument();
+  });
+});

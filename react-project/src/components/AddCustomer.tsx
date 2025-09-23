@@ -23,7 +23,7 @@ function AddCustomer(props: any) {
     };
     return(
         <div className='page'>
-            <h2 className="add-customer-title">Add Customer</h2>
+            <h2 data-testid='add-customer-title' className="add-customer-title">Add Customer</h2>
             <form onSubmit={handleSubmit} className="add-customer-form" data-testid="add-customer-form">
                 <div>
                     {/* <label htmlFor="id">ID:</label>

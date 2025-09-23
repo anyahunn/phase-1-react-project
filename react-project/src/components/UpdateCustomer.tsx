@@ -32,7 +32,7 @@ function UpdateCustomer(props: any) {
 
     return(
         <div className='page'>
-            <h2 className='update-customer-title'>Update Customer</h2>
+            <h2 data-testid='update-customer-title' className='update-customer-title'>Update Customer</h2>
             <form onSubmit={handleSubmit} className="update-customer-form" data-testid="update-customer-form">
                 <div>
                     <label htmlFor="name">Name:</label>

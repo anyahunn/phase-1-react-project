@@ -36,7 +36,7 @@ function UpdateCustomer() {
     return (
         <div className='container'>
             <h2 className="update-customer-title">Update Customer</h2>
-            <form onSubmit={handleSubmit} className="update-customer-form">
+            <form onSubmit={handleSubmit} data-testid="update-customer-form" className="update-customer-form">
                 <div className="form-group">
                     <label className="label" htmlFor="name">Name:</label>
                     <input
@@ -73,7 +73,7 @@ function UpdateCustomer() {
                         required
                     />
                 </div>
-                <button className="submit-button" type="submit">Update Customer</button>
+                <button className="submit-button" data-testid="update-customer-button" type="submit">Update Customer</button>
             </form>
             <button className="button-cancel" onClick={cancel}>Cancel</button>
         </div>

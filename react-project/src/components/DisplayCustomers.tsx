@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getAll } from '../../../ProjectAssets/memdb.js';
+import AddCustomer from './AddCustomer';
+import UpdateCustomer from './UpdateCustomer';
 import './DisplayCustomers.css';
 
 interface Customer {
@@ -12,28 +14,30 @@ interface Customer {
 
 const DisplayCustomers: React.FC<{}> = ({}) => {
 	const navigate = useNavigate();
-	const [customers, setCustomers] = useState<Customer[]>([]); //Use for v2 and v3
+	const [customers, setCustomers] = useState<Customer[]>([]);
 	const [selectedCustomer, setSelectedCustomer] = useState<number | -1>(-1);
-    const buttonText = selectedCustomer != -1 ? "Update Customer" : "Add Customer";
+	const [refreshKey, setRefreshKey] = useState<number>(0);
 	const buttonText2 = "Delete Customer";
-    //Dont use this until v3 
-	// useEffect(() => {
-	// 	fetch('http://localhost:4000/customers')
-	// 		.then((res) => res.json())
-	// 		.then((data) => setCustomers(data))
-	// 		.catch((err) => console.error('Failed to fetch customers:', err));
-	// }, []);
 
-    //Dont use until v2
     useEffect(() => {
         const data = getAll('customers') as Customer[];
         setCustomers(data);
     }, []);
 
+	const refreshCustomers = () => {
+		// Use setTimeout to ensure memdb operations complete before refresh
+		setTimeout(() => {
+			const data = getAll('customers') as Customer[];
+			setCustomers([...data]); // Force new array reference to trigger re-render
+			setSelectedCustomer(-1);
+			setRefreshKey(prev => prev + 1); // Force component re-render
+		}, 0);
+	};
+
 	return (
 		<div>
 			<h2 className="customer-list-title">Customer List</h2>
-			<table className="customer-table">
+			<table key={`table-${refreshKey}`} data-testid="customer-table" className="customer-table">
 				<thead>
 					<tr>
 						<th>ID</th>
@@ -48,6 +52,7 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
 						return (
 							<tr
 								key={customer.id}
+								data-testid={`customer-row-${customer.id}`}
 								className={isSelected ? 'selected-row' : ''}
 								onClick={() => setSelectedCustomer(isSelected ? -1 : customer.id)}
 							>
@@ -61,21 +66,6 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
 				</tbody>
 			</table>
             
-			<button
-				className="add-customer-btn"
-				onClick={() => {
-					if (selectedCustomer != -1) {
-                        console.log(customers.length);
-						navigate(`/update_customer/${selectedCustomer}`);
-					} else {
-                        console.log(customers.length);
-						navigate(`/add_customer/${customers.length + 1}`);
-					}
-				}}
-			>
-				{buttonText}
-			</button>
-
 			<button
 				className="delete-customer-btn"
 				onClick={() => {
@@ -94,6 +84,24 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
 			>
 				{buttonText2}
 			</button>
+
+			<div style={{ marginTop: '20px' }}>
+				{selectedCustomer != -1 ? (
+					<UpdateCustomer 
+						key={`update-${selectedCustomer}-${refreshKey}`}
+						customerId={selectedCustomer}
+						onCustomerUpdated={refreshCustomers}
+						onCancel={() => setSelectedCustomer(-1)}
+					/>
+				) : (
+					<AddCustomer 
+						key={`add-${customers.length + 1}-${refreshKey}`}
+						id={customers.length + 1}
+						onCustomerAdded={refreshCustomers}
+						onCancel={() => {}}
+					/>
+				)}
+			</div>
 		</div>
 	);
 };

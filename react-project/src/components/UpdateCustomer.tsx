@@ -3,8 +3,15 @@ import { useNavigate, useParams } from 'react-router-dom';
 import * as memdb from '../../../ProjectAssets/memdb.js';
 import './UpdateCustomer.css';
 
-function UpdateCustomer() {
-    const { id } = useParams();
+interface UpdateCustomerProps {
+    customerId?: number;
+    onCustomerUpdated?: () => void;
+    onCancel?: () => void;
+}
+
+function UpdateCustomer({ customerId: propId, onCustomerUpdated, onCancel }: UpdateCustomerProps = {}) {
+    const { id: paramId } = useParams();
+    const id = propId || Number(paramId);
     const navigate = useNavigate();
     const [customer, setCustomer] = useState({ id: Number(id), name: '', email: '', password: '' });
 
@@ -16,7 +23,11 @@ function UpdateCustomer() {
     }, [id]);
 
     const cancel = () => {
-        navigate('/');
+        if (onCancel) {
+            onCancel();
+        } else {
+            navigate('/');
+        }
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -28,16 +39,22 @@ function UpdateCustomer() {
             password: customer.password
         };
         memdb.put(Number(updatedCustomer.id), updatedCustomer);
-        navigate('/');
+        
+        if (onCustomerUpdated) {
+            onCustomerUpdated();
+        } else {
+            navigate('/');
+        }
     };
 
     return (
         <div className='container'>
             <h2 data-testid="update-customer-title" className="update-customer-title">Update Customer</h2>
-            <form onSubmit={handleSubmit} className="update-customer-form">
+            <form onSubmit={handleSubmit} data-testid="update-customer-form" className="update-customer-form">
                 <div className="form-group">
                     <label className="label" htmlFor="name">Name:</label>
                     <input
+                        data-testid="name-input"
                         className="input"
                         type="text"
                         id="name"
@@ -50,6 +67,7 @@ function UpdateCustomer() {
                 <div className="form-group">
                     <label className="label" htmlFor="email">Email:</label>
                     <input
+                        data-testid="email-input"
                         className="input"
                         type="email"
                         id="email"
@@ -62,6 +80,7 @@ function UpdateCustomer() {
                 <div className="form-group">
                     <label className="label" htmlFor="password">Password:</label>
                     <input
+                        data-testid="password-input"
                         className="input"
                         type="password"
                         id="password"
@@ -71,7 +90,7 @@ function UpdateCustomer() {
                         required
                     />
                 </div>
-                <button className="submit-button" type="submit">Update Customer</button>
+                <button data-testid="submit-button" className="submit-button" type="submit">Update Customer</button>
             </form>
             <button className="button-cancel" onClick={cancel}>Cancel</button>
         </div>

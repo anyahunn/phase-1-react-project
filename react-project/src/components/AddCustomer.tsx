@@ -3,32 +3,53 @@ import { useNavigate, useParams } from 'react-router-dom';
 import * as memdb from '../../../ProjectAssets/memdb.js';
 import './AddCustomer.css';
 
-function AddCustomer() {
-    const { id } = useParams();
+interface AddCustomerProps {
+    id?: number;
+    onCustomerAdded?: () => void;
+    onCancel?: () => void;
+}
+
+function AddCustomer({ id: propId, onCustomerAdded, onCancel }: AddCustomerProps = {}) {
+    const { id: paramId } = useParams();
+    const id = propId || Number(paramId);
     const [customer, setCustomer] = useState({ id: id, name: "", email: "", password: "" });
     const navigate = useNavigate();
+    
     const cancel = () => {
-        navigate('/');
+        if (onCancel) {
+            onCancel();
+        } else {
+            navigate('/');
+        }
     };
+    
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Generate a new id if needed
         const newCustomer = {
-            id: Number(id), // or use a better id logic
+            id: Number(id),
             name: customer.name,
             email: customer.email,
             password: customer.password
         };
         memdb.post(newCustomer);
-        navigate('/'); // or '/displayCustomers' if that's your route
+        
+        // Clear form after submission
+        setCustomer({ id: Number(id) + 1, name: "", email: "", password: "" });
+        
+        if (onCustomerAdded) {
+            onCustomerAdded();
+        } else {
+            navigate('/');
+        }
     };
     return (
         <div className='container'>
             <h2 data-testid="add-customer-title" className="add-customer-title">Add Customer</h2>
-            <form onSubmit={handleSubmit} className="add-customer-form">
+            <form onSubmit={handleSubmit} data-testid="add-customer-form" className="add-customer-form">
                 <div className="form-group">
                     <label className="label" htmlFor="name">Name:</label>
                     <input
+                        data-testid="name-input"
                         className="input"
                         type="text"
                         id="name"
@@ -41,6 +62,7 @@ function AddCustomer() {
                 <div className="form-group">
                     <label className="label" htmlFor="email">Email:</label>
                     <input
+                        data-testid="email-input"
                         className="input"
                         type="email"
                         id="email"
@@ -53,6 +75,7 @@ function AddCustomer() {
                 <div className="form-group">
                     <label className="label" htmlFor="password">Password:</label>
                     <input
+                        data-testid="password-input"
                         className="input"
                         type="password"
                         id="password"
@@ -62,7 +85,7 @@ function AddCustomer() {
                         required
                     />
                 </div>
-                <button className="button" type="submit">Add Customer</button>
+                <button data-testid="add-customer-submit" className="button" type="submit">Add Customer</button>
             </form>
             <button className="button cancel" onClick={cancel}>Cancel</button>
         </div>

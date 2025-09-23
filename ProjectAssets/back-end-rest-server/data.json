@@ -7,7 +7,7 @@
       "password": "maryj"
     },
     {
-      "id": 1,      
+      "id": 1,
       "name": "Karen Addams",
       "email": "karena@abc.com",
       "password": "karena"
@@ -19,5 +19,4 @@
       "password": "scottr"
     }
   ]
-
 }

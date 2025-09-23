@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-//import { getAll } from '../../../ProjectAssets/memdb.js';
+import AddCustomer from './AddCustomer';
+import UpdateCustomer from './UpdateCustomer';
 import './DisplayCustomers.css';
 
 interface Customer {
@@ -12,22 +13,30 @@ interface Customer {
 
 const DisplayCustomers: React.FC<{}> = ({}) => {
 	const navigate = useNavigate();
-	const [customers, setCustomers] = useState<Customer[]>([]); //Use for v2 and v3
+	const [customers, setCustomers] = useState<Customer[]>([]);
 	const [selectedCustomer, setSelectedCustomer] = useState<number | -1>(-1);
-    const buttonText = selectedCustomer != -1 ? "Update Customer" : "Add Customer";
 	const buttonText2 = "Delete Customer";
-    //Dont use this until v3 
+
 	useEffect(() => {
+		fetchCustomers();
+	}, []);
+
+	const fetchCustomers = () => {
 		fetch('http://localhost:4000/customers')
 			.then((res) => res.json())
 			.then((data) => setCustomers(data))
 			.catch((err) => console.error('Failed to fetch customers:', err));
-	}, []);
+	};
+
+	const refreshCustomers = () => {
+		fetchCustomers();
+		setSelectedCustomer(-1);
+	};
 
 	return (
 		<div>
 			<h2 className="customer-list-title">Customer List</h2>
-			<table className="customer-table">
+			<table data-testid="customer-table" className="customer-table">
 				<thead>
 					<tr>
 						<th>ID</th>
@@ -57,22 +66,6 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
 			</table>
             
 			<button
-				className="add-customer-btn"
-                data-testid="add-customer-btn"
-				onClick={() => {
-					if (selectedCustomer != -1) {
-                        console.log(customers.length);
-						navigate(`/update_customer/${selectedCustomer}`);
-					} else {
-                        console.log(customers.length);
-						navigate(`/add_customer/${customers.length + 1}`);
-					}
-				}}
-			>
-				{buttonText}
-			</button>
-
-			<button
 				className="delete-customer-btn"
                 data-testid="delete-customer-btn"
 				onClick={() => {
@@ -90,6 +83,21 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
 			>
 				{buttonText2}
 			</button>
+
+			<div style={{ marginTop: '20px' }}>
+				{selectedCustomer != -1 ? (
+					<UpdateCustomer 
+						customerId={selectedCustomer}
+						onCustomerUpdated={refreshCustomers}
+						onCancel={() => setSelectedCustomer(-1)}
+					/>
+				) : (
+					<AddCustomer 
+						onCustomerAdded={refreshCustomers}
+						onCancel={() => {}}
+					/>
+				)}
+			</div>
 		</div>
 	);
 };

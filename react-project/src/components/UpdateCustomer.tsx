@@ -2,8 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import './UpdateCustomer.css';
 
-function UpdateCustomer() {
-    const { id } = useParams();
+interface UpdateCustomerProps {
+    customerId?: number;
+    onCustomerUpdated?: () => void;
+    onCancel?: () => void;
+}
+
+function UpdateCustomer({ customerId: propId, onCustomerUpdated, onCancel }: UpdateCustomerProps = {}) {
+    const { id: paramId } = useParams();
+    const id = propId || Number(paramId);
     const navigate = useNavigate();
     const [customer, setCustomer] = useState({ id: Number(id), name: '', email: '', password: '' });
 
@@ -13,33 +20,44 @@ function UpdateCustomer() {
             .then(res => res.json())
             .then(data => {
                 setCustomer({ id: data.id, name: data.name, email: data.email, password: data.password });
-            });
+            })
+            .catch(err => console.error('Failed to fetch customer:', err));
     }, [id]);
 
     const cancel = () => {
-        navigate('/');
+        if (onCancel) {
+            onCancel();
+        } else {
+            navigate('/');
+        }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         // Update customer on REST server
-        fetch(`http://localhost:4000/customers/${id}`, {
+        await fetch(`http://localhost:4000/customers/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(customer)
-        })
-        .then(() => navigate('/'));
+        });
+        
+        if (onCustomerUpdated) {
+            onCustomerUpdated();
+        } else {
+            navigate('/');
+        }
     };
 
     return (
         <div className='container'>
-            <h2 className="update-customer-title">Update Customer</h2>
+            <h2 data-testid="update-customer-title" className="update-customer-title">Update Customer</h2>
             <form onSubmit={handleSubmit} data-testid="update-customer-form" className="update-customer-form">
                 <div className="form-group">
                     <label className="label" htmlFor="name">Name:</label>
                     <input
+                        data-testid="name-input"
                         className="input"
                         type="text"
                         id="name"
@@ -52,6 +70,7 @@ function UpdateCustomer() {
                 <div className="form-group">
                     <label className="label" htmlFor="email">Email:</label>
                     <input
+                        data-testid="email-input"
                         className="input"
                         type="email"
                         id="email"
@@ -64,6 +83,7 @@ function UpdateCustomer() {
                 <div className="form-group">
                     <label className="label" htmlFor="password">Password:</label>
                     <input
+                        data-testid="password-input"
                         className="input"
                         type="password"
                         id="password"
@@ -73,7 +93,7 @@ function UpdateCustomer() {
                         required
                     />
                 </div>
-                <button className="submit-button" data-testid="update-customer-button" type="submit">Update Customer</button>
+                <button data-testid="submit-button" className="submit-button" type="submit">Update Customer</button>
             </form>
             <button className="button-cancel" onClick={cancel}>Cancel</button>
         </div>

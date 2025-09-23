@@ -1,19 +1,9 @@
-// import {render, screen } from '@testing-library/react';
-// import {it, expect} from 'vitest';
-// import "@testing-library/jest-dom/vitest";
-// import App from '../App';
-// import AddCustomer from './AddCustomer';
-
-// it("renders", () =>{
-//     render(< App />);
-//     let element = screen.getByText(/Customer List/);
-//     expect(element).toBeInTheDocument();
-// })
+import { render, screen, fireEvent } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
-import "@testing-library/jest-dom/vitest";
-import userEvent from '@testing-library/user-event';
-import { MemoryRouter, useNavigate } from 'react-router-dom';
+import AddCustomer from './AddCustomer';
+import { MemoryRouter } from 'react-router-dom';
 
 // Mock memdb
 vi.mock('../../../ProjectAssets/memdb.js', () => ({
@@ -22,20 +12,23 @@ vi.mock('../../../ProjectAssets/memdb.js', () => ({
 
 // Mock useNavigate
 const mockNavigate = vi.fn();
-vi.mock('react-router-dom', async (importOriginal) => {
+vi.mock('react-router-dom', async (importOriginal: any) => {
   const actual = await importOriginal();
   return {
     ...actual,
     useNavigate: () => mockNavigate,
+    useParams: () => ({ id: '123' }),
   };
 });
 
-import AddCustomer from './AddCustomer';
+// Import the mocked module to access the mock function
+import * as memdb from '../../../ProjectAssets/memdb.js';
 
 describe('AddCustomer Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockNavigate.mockReset();
+    vi.mocked(memdb.post).mockReset();
   });
 
   it('renders the form and cancel button', () => {
@@ -44,7 +37,6 @@ describe('AddCustomer Component', () => {
         <AddCustomer />
       </MemoryRouter>
     );
-    expect(screen.getAllByText(/add customer/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
@@ -52,49 +44,48 @@ describe('AddCustomer Component', () => {
     expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
   });
 
-//   it('allows user to type in all fields', async () => {
-//     render(
-//       <MemoryRouter>
-//         <AddCustomer />
-//       </MemoryRouter>
-//     );
-//     await userEvent.type(screen.getByLabelText(/name/i), 'Dana');
-//     await userEvent.type(screen.getByLabelText(/email/i), 'dana@example.com');
-//     await userEvent.type(screen.getByLabelText(/password/i), 'p@ss4');
-//     expect(screen.getByLabelText(/name/i)).toHaveValue('Dana');
-//     expect(screen.getByLabelText(/email/i)).toHaveValue('dana@example.com');
-//     expect(screen.getByLabelText(/password/i)).toHaveValue('p@ss4');
-//   });
+  it('allows user to type in all fields', () => {
+    render(
+      <MemoryRouter>
+        <AddCustomer />
+      </MemoryRouter>
+    );
+    fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Dana' } });
+    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'dana@example.com' } });
+    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'p@ss4' } });
+    expect(screen.getByLabelText(/name/i)).toHaveValue('Dana');
+    expect(screen.getByLabelText(/email/i)).toHaveValue('dana@example.com');
+    expect(screen.getByLabelText(/password/i)).toHaveValue('p@ss4');
+  });
 
-//   it('calls memdb.post and navigates on submit', async () => {
-//     const memdb = await import('../../../ProjectAssets/memdb.js');
-//     render(
-//       <MemoryRouter>
-//         <AddCustomer />
-//       </MemoryRouter>
-//     );
-//     await userEvent.type(screen.getByLabelText(/name/i), 'Dana');
-//     await userEvent.type(screen.getByLabelText(/email/i), 'dana@example.com');
-//     await userEvent.type(screen.getByLabelText(/password/i), 'p@ss4');
-//     await userEvent.click(screen.getByRole('button', { name: /add customer/i }));
+  it('calls memdb.post and navigates on submit', () => {
+    render(
+      <MemoryRouter>
+        <AddCustomer />
+      </MemoryRouter>
+    );
+    fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Dana' } });
+    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'dana@example.com' } });
+    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'p@ss4' } });
+    fireEvent.click(screen.getByRole('button', { name: /add customer/i }));
+    expect(vi.mocked(memdb.post)).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: 123,
+        name: 'Dana',
+        email: 'dana@example.com',
+        password: 'p@ss4',
+      })
+    );
+    expect(mockNavigate).toHaveBeenCalledWith('/');
+  });
 
-//     expect(memdb.post).toHaveBeenCalledWith(
-//       expect.objectContaining({
-//         name: 'Dana',
-//         email: 'dana@example.com',
-//         password: 'p@ss4',
-//       })
-//     );
-//     expect(mockNavigate).toHaveBeenCalledWith('/');
-//   });
-
-//   it('navigates back when cancel is clicked', async () => {
-//     render(
-//       <MemoryRouter>
-//         <AddCustomer />
-//       </MemoryRouter>
-//     );
-//     await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
-//     expect(mockNavigate).toHaveBeenCalledWith('/');
-//   });
+  it('navigates back when cancel is clicked', () => {
+    render(
+      <MemoryRouter>
+        <AddCustomer />
+      </MemoryRouter>
+    );
+    fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
+    expect(mockNavigate).toHaveBeenCalledWith('/');
+  });
 });

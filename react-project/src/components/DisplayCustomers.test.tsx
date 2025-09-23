@@ -4,9 +4,18 @@ import '@testing-library/jest-dom';
 import { BrowserRouter as Router } from 'react-router-dom';
 import DisplayCustomers from './DisplayCustomers';
 import React from 'react';
-import { beforeAll, describe, expect, test } from 'vitest';
+import { beforeAll, describe, expect, test, vi } from 'vitest';
 
-let mockCustomers: string | any[]; 
+const mockNavigate = vi.fn();
+vi.mock('react-router-dom', async () => {
+    const actual = await vi.importActual('react-router-dom');
+    return {
+        ...actual,
+        useNavigate: () => mockNavigate,
+    };
+});
+
+let mockCustomers: any[]; 
 
 describe('DisplayCustomers Component', () => {
     beforeAll(() => {
@@ -14,27 +23,23 @@ describe('DisplayCustomers Component', () => {
             { id: 1, name: 'John Doe', email: 'john@example.com' },
             { id: 2, name: 'Jane Smith', email: 'jane@example.com' }
         ];
+        vi.clearAllMocks();
     });
-    test('renders customer list', () => {
+
+    test('renders customer list and handles row selection', () => {
         render(
             <Router>
                 <DisplayCustomers customers={mockCustomers} customer={null} />
             </Router>
         );
 
+        // Test rendering
         const customerElements = screen.getAllByTestId(/customer-row-\d+/);
         expect(customerElements).toHaveLength(mockCustomers.length);
         expect(customerElements[0]).toHaveTextContent('John Doe');
         expect(customerElements[1]).toHaveTextContent('Jane Smith');
-    });
 
-    test('selects and deselects a customer row', () => {
-        render(
-            <Router>
-                <DisplayCustomers customers={mockCustomers} customer={null} />
-            </Router>
-        );
-
+        // Test row selection/deselection
         const firstRow = screen.getByTestId('customer-row-1');
         fireEvent.click(firstRow);
         expect(firstRow).toHaveClass('selected-row');
@@ -43,41 +48,36 @@ describe('DisplayCustomers Component', () => {
     });
 
     test('navigates to add customer when no row is selected', () => {
-        const { container } = render(
+        render(
             <Router>
                 <DisplayCustomers customers={mockCustomers} customer={null} />
             </Router>
         );
+        
         const addButton = screen.getByText('Add Customer');
-        expect(addButton).toBeInTheDocument();
         fireEvent.click(addButton);
-        expect(window.location.pathname).toBe('/add_customer/3');
-    });
-    test('navigates to update customer when a row is selected', () => {
-        const { container } = render(
-            <Router>
-                <DisplayCustomers customers={mockCustomers} customer={null} />
-            </Router>
-        );
-        const firstRow = screen.getByTestId('customer-row-1');
-        fireEvent.click(firstRow);
-        const addButton = screen.getByText('Update Customer');
-        expect(addButton).toBeInTheDocument();
-        fireEvent.click(addButton);
-        expect(window.location.pathname).toBe('/update_customer/1');
+        expect(mockNavigate).toHaveBeenCalledWith('/add_customer/3');
     });
 
-    test('navigates to delete customer when a row is selected', () => {
-        const { container } = render(
+    test('navigates to update and delete customer when row is selected', () => {
+        render(
             <Router>
                 <DisplayCustomers customers={mockCustomers} customer={null} />
             </Router>
         );
+        
+        // Select a row
         const firstRow = screen.getByTestId('customer-row-1');
         fireEvent.click(firstRow);
+        
+        // Test update navigation
+        const updateButton = screen.getByText('Update Customer');
+        fireEvent.click(updateButton);
+        expect(mockNavigate).toHaveBeenCalledWith('/update_customer/1');
+        
+        // Test delete navigation
         const deleteButton = screen.getByText('Delete Customer');
-        expect(deleteButton).toBeInTheDocument();
         fireEvent.click(deleteButton);
-        expect(window.location.pathname).toBe('/delete_customer/1');
+        expect(mockNavigate).toHaveBeenCalledWith('/delete_customer/1');
     });
 });

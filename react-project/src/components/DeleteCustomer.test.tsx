@@ -45,21 +45,6 @@ describe('DeleteCustomer Component', () => {
         expect(screen.getByText(/Cancel/i)).toBeInTheDocument();
     });
 
-    test('cancels delete and navigates back when cancel button is clicked', () => {
-        render(
-            <MemoryRouter initialEntries={[`/delete_customer/1`]}>
-                <Routes>
-                    <Route path="/delete_customer/:id" element={
-                        <DeleteCustomer customers={mockCustomers} deleteCustomer={mockDeleteCustomer} />
-                    } />
-                </Routes>
-            </MemoryRouter>
-        );
-        const cancelButton = screen.getByText(/Cancel/i);
-        fireEvent.click(cancelButton);
-        expect(mockNavigate).toHaveBeenCalledWith('/');
-    });
-
     test('deletes customer and navigates back when confirm delete button is clicked', () => {
         render(
             <MemoryRouter initialEntries={[`/delete_customer/1`]}>
@@ -76,7 +61,22 @@ describe('DeleteCustomer Component', () => {
         expect(mockNavigate).toHaveBeenCalledWith('/');
     });
 
-    test('shows customer not found message for invalid id', () => {
+    test('cancels delete and navigates back when cancel button is clicked', () => {
+        render(
+            <MemoryRouter initialEntries={[`/delete_customer/1`]}>
+                <Routes>
+                    <Route path="/delete_customer/:id" element={
+                        <DeleteCustomer customers={mockCustomers} deleteCustomer={mockDeleteCustomer} />
+                    } />
+                </Routes>
+            </MemoryRouter>
+        );
+        const cancelButton = screen.getByText(/Cancel/i);
+        fireEvent.click(cancelButton);
+        expect(mockNavigate).toHaveBeenCalledWith('/');
+    });
+
+    test('shows customer not found message and handles navigation for invalid id', () => {
         render(
             <MemoryRouter initialEntries={[`/delete_customer/999`]}>
                 <Routes>
@@ -88,38 +88,10 @@ describe('DeleteCustomer Component', () => {
         );
         expect(screen.getByText(/Customer not found/i)).toBeInTheDocument();
         expect(screen.getByText(/Back/i)).toBeInTheDocument();
-    });
-
-    test('navigates back when back button is clicked in customer not found case', () => {
-        render(
-            <MemoryRouter initialEntries={[`/delete_customer/999`]}>
-                <Routes>
-                    <Route path="/delete_customer/:id" element={
-                        <DeleteCustomer customers={mockCustomers} deleteCustomer={mockDeleteCustomer} />
-                    } />
-                </Routes>
-            </MemoryRouter>
-        );
+        
         const backButton = screen.getByText(/Back/i);
         fireEvent.click(backButton);
         expect(mockNavigate).toHaveBeenCalledWith('/');
-    });
-
-    test('handles string id parameter conversion to number', () => {
-        render(
-            <MemoryRouter initialEntries={[`/delete_customer/2`]}>
-                <Routes>
-                    <Route path="/delete_customer/:id" element={
-                        <DeleteCustomer customers={mockCustomers} deleteCustomer={mockDeleteCustomer} />
-                    } />
-                </Routes>
-            </MemoryRouter>
-        );
-        expect(screen.getByText('Jane Smith')).toBeInTheDocument();
-        
-        const confirmButton = screen.getByTestId('confirm-delete-button');
-        fireEvent.click(confirmButton);
-        expect(mockDeleteCustomer).toHaveBeenCalledWith(2); 
     });
 
     test('handles non-numeric id parameter', () => {

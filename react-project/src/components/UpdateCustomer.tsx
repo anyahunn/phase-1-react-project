@@ -33,7 +33,7 @@ function UpdateCustomer() {
 
     return (
         <div className='container'>
-            <h2 className="update-customer-title">Update Customer</h2>
+            <h2 data-testid="update-customer-title" className="update-customer-title">Update Customer</h2>
             <form onSubmit={handleSubmit} className="update-customer-form">
                 <div className="form-group">
                     <label className="label" htmlFor="name">Name:</label>

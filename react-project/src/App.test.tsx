@@ -1,299 +1,490 @@
-/*// src/__tests__/App.test.tsx
-import { render, screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { describe, it, beforeEach, expect, vi } from 'vitest';
-import App from './App.js';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import React from 'react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { MemoryRouter } from 'react-router-dom';
+import DisplayCustomers from './components/DisplayCustomers';
+import AddCustomer from './components/AddCustomer';
+import UpdateCustomer from './components/UpdateCustomer';
+import DeleteCustomer from './components/DeleteCustomer';
 
-// Mock memdb with an in-memory data store that mirrors your module API
-vi.mock('../../ProjectAssets/memdb.js', () => {
-  let store = [
-    { id: 1, name: 'Alice', email: 'alice@example.com', password: 'p@ss1' },
-    { id: 2, name: 'Bob', email: 'bob@example.com', password: 'p@ss2' },
-    { id: 3, name: 'Charlie', email: 'charlie@example.com', password: 'p@ss3' },
-  ];
+// Mock memdb
+vi.mock('../../ProjectAssets/memdb.js', () => ({
+  getAll: vi.fn(),
+  get: vi.fn(),
+  post: vi.fn(),
+  put: vi.fn(),
+  deleteById: vi.fn(),
+}));
 
+// Mock useNavigate and useParams
+vi.mock('react-router-dom', async (importOriginal: any) => {
+  const actual = await importOriginal();
   return {
-    getAll: () => [...store],
-    get: (id: number) => store.find((c) => c.id === id) ?? null,
-    post: (customer: any) => {
-      store.push(customer);
-      return customer;
-    },
-    put: (id: number, customer: any) => {
-      const idx = store.findIndex((c) => c.id === id);
-      if (idx !== -1) store[idx] = { ...store[idx], ...customer };
-      return store[idx] ?? null;
-    },
-    deleteById: (id: number) => {
-      store = store.filter((c) => c.id !== id);
-    },
-    __reset: (items?: any[]) => {
-      store =
-        items ??
-        [
-          { id: 1, name: 'Alice', email: 'alice@example.com', password: 'p@ss1' },
-          { id: 2, name: 'Bob', email: 'bob@example.com', password: 'p@ss2' },
-          { id: 3, name: 'Charlie', email: 'charlie@example.com', password: 'p@ss3' },
-        ];
-    },
+    ...actual,
+    useNavigate: vi.fn(() => vi.fn()),
+    useParams: vi.fn(() => ({ id: '1' })),
   };
 });
 
-const memdb = await import('../../ProjectAssets/memdb.js');
+// Import the mocked modules
+import { getAll, get, post, put } from '../../ProjectAssets/memdb.js';
+import { useNavigate, useParams } from 'react-router-dom';
 
-const renderApp = () => render(<App />);
+describe('App Component - Full Application Tests', () => {
+  const mockCustomers = [
+    { id: 1, name: 'John Doe', email: 'john@example.com', password: 'password123' },
+    { id: 2, name: 'Jane Smith', email: 'jane@example.com', password: 'password456' },
+    { id: 3, name: 'Alice Johnson', email: 'alice@example.com', password: 'password789' }
+  ];
 
-const getTableBodyRows = () => {
-  const table = screen.getByRole('table');
-  const tbody = table.querySelector('tbody')!;
-  return Array.from(tbody.querySelectorAll('tr'));
-};
+  const mockNavigate = vi.fn();
 
-const getRowByName = (name: string) => {
-  const rows = getTableBodyRows();
-  const row = rows.find((r) => within(r).queryByText(name));
-  if (!row) throw new Error(`Row not found for name: ${name}`);
-  return row;
-};
-
-describe('Manual Test Scripts (Vitest + RTL)', () => {
   beforeEach(() => {
-    // reset mock DB and mount the app at "/"
-    (memdb as any).__reset();
-    renderApp();
+    vi.clearAllMocks();
+    vi.mocked(getAll).mockReturnValue(mockCustomers);
+    vi.mocked(useNavigate).mockReturnValue(mockNavigate);
   });
 
-  // 1, 1.1, 1.2
-  it('1: displays list of all customers after refresh', () => {
-    expect(screen.getByRole('heading', { name: /customer list/i })).toBeInTheDocument();
-    const rows = getTableBodyRows();
-    expect(rows).toHaveLength(3);
-    expect(screen.getByText('Alice')).toBeInTheDocument();
-    expect(screen.getByText('Bob')).toBeInTheDocument();
-    expect(screen.getByText('Charlie')).toBeInTheDocument();
+  // Test 1: The app should display a list of Customer records
+  describe('1. Customer List Display', () => {
+    it('1.1-1.2 should display all available customer records on app refresh', () => {
+      render(
+        <MemoryRouter>
+          <DisplayCustomers />
+        </MemoryRouter>
+      );
+
+      expect(screen.getByText('John Doe')).toBeInTheDocument();
+      expect(screen.getByText('jane@example.com')).toBeInTheDocument();
+      expect(screen.getByText('Alice Johnson')).toBeInTheDocument();
+      expect(vi.mocked(getAll)).toHaveBeenCalledWith('customers');
+    });
   });
 
-  // 2, 2.1, 2.2
-  it('2: shows the label "Customer List" above the list', () => {
-    expect(screen.getByRole('heading', { name: /customer list/i })).toBeInTheDocument();
+  // Test 2: The label "Customer List" should appear on-screen
+  describe('2. Customer List Label', () => {
+    it('2.1-2.2 should show "Customer List" text above the records', () => {
+      render(
+        <MemoryRouter>
+          <DisplayCustomers />
+        </MemoryRouter>
+      );
+
+      expect(screen.getByText('Customer List')).toBeInTheDocument();
+    });
   });
 
-  // 3, 3.1, 3.2, 3.3
-  it('3: list shows name/email/password; add form allows entry of all fields', async () => {
-    const aliceRow = getRowByName('Alice');
-    expect(within(aliceRow).getByText('alice@example.com')).toBeInTheDocument();
-    expect(within(aliceRow).getByText('p@ss1')).toBeInTheDocument();
+  // Test 3: Customer fields should be maintained (name, email, password)
+  describe('3. Customer Fields Display', () => {
+    it('3.1-3.2 should show name, email, and password fields for each record', () => {
+      render(
+        <MemoryRouter>
+          <DisplayCustomers />
+        </MemoryRouter>
+      );
 
-    const addOrUpdateBtn = screen.getByRole('button', { name: /add customer/i });
-    await userEvent.click(addOrUpdateBtn);
+      // Check table headers
+      expect(screen.getByText('Name')).toBeInTheDocument();
+      expect(screen.getByText('Email')).toBeInTheDocument();
+      expect(screen.getByText('Password')).toBeInTheDocument();
 
-    // On Add page
-    const nameInput = screen.getByLabelText(/name/i) as HTMLInputElement;
-    const emailInput = screen.getByLabelText(/email/i) as HTMLInputElement;
-    const passwordInput = screen.getByLabelText(/password/i) as HTMLInputElement;
+      // Check data is displayed
+      expect(screen.getByText('John Doe')).toBeInTheDocument();
+      expect(screen.getByText('john@example.com')).toBeInTheDocument();
+      expect(screen.getByText('password123')).toBeInTheDocument();
+    });
 
-    expect(nameInput.placeholder).toMatch(/name/i);
-    expect(emailInput.placeholder).toMatch(/email/i);
-    expect(passwordInput.placeholder).toMatch(/password/i);
+    it('3.3 should allow entry of name, email, and password in add form', () => {
+      vi.mocked(useParams).mockReturnValue({ id: '4' });
 
-    await userEvent.type(nameInput, 'Dana');
-    await userEvent.type(emailInput, 'dana@example.com');
-    await userEvent.type(passwordInput, 'p@ss4');
+      render(
+        <MemoryRouter>
+          <AddCustomer />
+        </MemoryRouter>
+      );
 
-    expect(nameInput.value).toBe('Dana');
-    expect(emailInput.value).toBe('dana@example.com');
-    expect(passwordInput.value).toBe('p@ss4');
+      expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    });
   });
 
-  // 4, 5, 6 and 5.1-5.6, 6.1
-  it('4-6: clicking a row selects/deselects; selected appears bold; form shows/clears data via Update/Cancel flows', async () => {
-    const bobRow = getRowByName('Bob');
+  // Test 4 & 5: Record selection and bold font
+  describe('4-5. Record Selection and Bold Display', () => {
+    it('5.1-5.3 should make selected record appear bold and show Add/Update button text', () => {
+      render(
+        <MemoryRouter>
+          <DisplayCustomers />
+        </MemoryRouter>
+      );
 
-    // Select
-    await userEvent.click(bobRow);
-    expect(bobRow.classList.contains('selected-row')).toBe(true);
+      const johnRow = screen.getByText('John Doe').closest('tr');
+      
+      // Initially no selection, should show "Add Customer"
+      expect(screen.getByRole('button', { name: /add customer/i })).toBeInTheDocument();
+      expect(johnRow).not.toHaveClass('selected-row');
 
-    // Open update form
-    const updateBtn = screen.getByRole('button', { name: /update customer/i });
-    await userEvent.click(updateBtn);
+      // Click to select
+      fireEvent.click(screen.getByText('John Doe'));
+      expect(johnRow).toHaveClass('selected-row');
+      expect(screen.getByRole('button', { name: /update customer/i })).toBeInTheDocument();
+    });
 
-    // Form shows selected data
-    const nameInput = screen.getByLabelText(/name/i) as HTMLInputElement;
-    const emailInput = screen.getByLabelText(/email/i) as HTMLInputElement;
-    const passwordInput = screen.getByLabelText(/password/i) as HTMLInputElement;
+    it('5.4-5.6 & 6.1 should deselect record when clicked again', () => {
+      render(
+        <MemoryRouter>
+          <DisplayCustomers />
+        </MemoryRouter>
+      );
 
-    expect(nameInput.value).toBe('Bob');
-    expect(emailInput.value).toBe('bob@example.com');
-    expect(passwordInput.value).toBe('p@ss2');
+      const johnRow = screen.getByText('John Doe').closest('tr');
+      
+      // Select record
+      fireEvent.click(screen.getByText('John Doe'));
+      expect(johnRow).toHaveClass('selected-row');
+      expect(screen.getByRole('button', { name: /update customer/i })).toBeInTheDocument();
 
-    // Cancel returns to list; click same row again to deselect
-    await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
-
-    const bobRow2 = getRowByName('Bob');
-    await userEvent.click(bobRow2); // select
-    expect(bobRow2.classList.contains('selected-row')).toBe(true);
-
-    await userEvent.click(bobRow2); // deselect
-    expect(bobRow2.classList.contains('selected-row')).toBe(false);
+      // Deselect record
+      fireEvent.click(screen.getByText('John Doe'));
+      expect(johnRow).not.toHaveClass('selected-row');
+      expect(screen.getByRole('button', { name: /add customer/i })).toBeInTheDocument();
+    });
   });
 
-  // 7, 7.1-7.4
-  it('7: form mode shows Add when none selected and Update when selected item is edited', async () => {
-    // Add mode: navigate to Add page
-    await userEvent.click(screen.getByRole('button', { name: /add customer/i }));
-    expect(screen.getByRole('heading', { name: /add customer/i })).toBeInTheDocument();
+  // Test 7: Add/Update form title changes
+  describe('7. Add/Update Form Title', () => {
+    it('7.1-7.2 should show "Add Customer" when no record selected', () => {
+      render(
+        <MemoryRouter>
+          <DisplayCustomers />
+        </MemoryRouter>
+      );
 
-    // Cancel back
-    await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
+      expect(screen.getByRole('button', { name: /add customer/i })).toBeInTheDocument();
+    });
 
-    // Select and open Update
-    await userEvent.click(getRowByName('Alice'));
-    await userEvent.click(screen.getByRole('button', { name: /update customer/i }));
-    expect(screen.getByRole('heading', { name: /update customer/i })).toBeInTheDocument();
+    it('7.3-7.4 should show "Update Customer" when record is selected', () => {
+      render(
+        <MemoryRouter>
+          <DisplayCustomers />
+        </MemoryRouter>
+      );
 
-    // Selected item is shown
-    expect((screen.getByLabelText(/name/i) as HTMLInputElement).value).toBe('Alice');
+      fireEvent.click(screen.getByText('John Doe'));
+      expect(screen.getByRole('button', { name: /update customer/i })).toBeInTheDocument();
+    });
   });
 
-  // 8, 8.1
-  it('8: update form shows the selected record fields', async () => {
-    await userEvent.click(getRowByName('Charlie'));
-    await userEvent.click(screen.getByRole('button', { name: /update customer/i }));
+  // Test 9: Buttons should appear
+  describe('9. Button Display', () => {
+    it('9.1-9.2 should show Add/Update and Delete buttons', () => {
+      render(
+        <MemoryRouter>
+          <DisplayCustomers />
+        </MemoryRouter>
+      );
 
-    expect((screen.getByLabelText(/name/i) as HTMLInputElement).value).toBe('Charlie');
-    expect((screen.getByLabelText(/email/i) as HTMLInputElement).value).toBe('charlie@example.com');
-    expect((screen.getByLabelText(/password/i) as HTMLInputElement).value).toBe('p@ss3');
+      expect(screen.getByRole('button', { name: /add customer/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /delete customer/i })).toBeInTheDocument();
+    });
   });
 
-  // 9, 9.1, 9.2
-  it('9: form pages show submit and cancel buttons', async () => {
-    // Add
-    await userEvent.click(screen.getByRole('button', { name: /add customer/i }));
-    expect(screen.getByRole('button', { name: /add customer/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
+  // Test 10-11: Delete functionality
+  describe('10-11. Delete Record Functionality', () => {
+    it('10.1-10.3 should navigate to delete page when delete button clicked with selection', () => {
+      render(
+        <MemoryRouter>
+          <DisplayCustomers />
+        </MemoryRouter>
+      );
 
-    // Back and Update
-    await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
-    await userEvent.click(getRowByName('Alice'));
-    await userEvent.click(screen.getByRole('button', { name: /update customer/i }));
-    expect(screen.getByRole('button', { name: /update customer/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
+      fireEvent.click(screen.getByText('John Doe'));
+      fireEvent.click(screen.getByRole('button', { name: /delete customer/i }));
+      
+      // Should call navigate with delete route
+      expect(mockNavigate).toHaveBeenCalledWith('/delete_customer/1');
+    });
+
+    it('should render delete customer page correctly', () => {
+      vi.mocked(get).mockReturnValue(mockCustomers[0]);
+      vi.mocked(useParams).mockReturnValue({ id: '1' });
+
+      render(
+        <MemoryRouter>
+          <DeleteCustomer />
+        </MemoryRouter>
+      );
+
+      expect(screen.getByText('Delete Customer')).toBeInTheDocument();
+      expect(screen.getByText('John Doe')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /confirm delete/i })).toBeInTheDocument();
+    });
   });
 
-  // 10, 10.1-10.3.4, 11, 11.1
-  it('10-11: deleting a selected record removes it from list and DB; clears selection', async () => {
-    // Select Bob
-    await userEvent.click(getRowByName('Bob'));
-    expect(getRowByName('Bob').classList.contains('selected-row')).toBe(true);
+  // Test 12: Field modification capability
+  describe('12. Field Modification', () => {
+    it('12.1-12.4 should allow text entry in add form fields', () => {
+      vi.mocked(useParams).mockReturnValue({ id: '4' });
 
-    // Navigate to delete
-    const delBtn = screen.getByRole('button', { name: /delete customer/i });
-    expect(delBtn).toBeEnabled();
-    await userEvent.click(delBtn);
+      render(
+        <MemoryRouter>
+          <AddCustomer />
+        </MemoryRouter>
+      );
 
-    // Confirm delete
-    await userEvent.click(screen.getByRole('button', { name: /confirm delete/i }));
+      const nameInput = screen.getByLabelText(/name/i);
+      const emailInput = screen.getByLabelText(/email/i);
+      const passwordInput = screen.getByLabelText(/password/i);
 
-    // Back on list: Bob is gone, no selection
-    expect(screen.queryByText('Bob')).not.toBeInTheDocument();
-    getTableBodyRows().forEach((r) => expect(r.classList.contains('selected-row')).toBe(false));
+      fireEvent.change(nameInput, { target: { value: 'New Customer' } });
+      fireEvent.change(emailInput, { target: { value: 'new@example.com' } });
+      fireEvent.change(passwordInput, { target: { value: 'newpassword' } });
 
-    // Confirm via memdb (REST facade)
-    expect((memdb as any).get(2)).toBeNull();
+      expect(nameInput).toHaveValue('New Customer');
+      expect(emailInput).toHaveValue('new@example.com');
+      expect(passwordInput).toHaveValue('newpassword');
+    });
+
+    it('should allow text entry in update form fields', () => {
+      vi.mocked(get).mockReturnValue(mockCustomers[0]);
+      vi.mocked(useParams).mockReturnValue({ id: '1' });
+
+      render(
+        <MemoryRouter>
+          <UpdateCustomer />
+        </MemoryRouter>
+      );
+
+      const nameInput = screen.getByLabelText(/name/i);
+      expect(nameInput).toBeInTheDocument();
+      
+      fireEvent.change(nameInput, { target: { value: 'Updated Name' } });
+      expect(nameInput).toHaveValue('Updated Name');
+    });
   });
 
-  // 12, 12.1-12.4
-  it('12: users can modify data in the form; empty fields accept typing; existing fields update', async () => {
-    // Add page: typing replaces placeholder (by value)
-    await userEvent.click(screen.getByRole('button', { name: /add customer/i }));
-    const nameA = screen.getByLabelText(/name/i) as HTMLInputElement;
-    const emailA = screen.getByLabelText(/email/i) as HTMLInputElement;
-    const passwordA = screen.getByLabelText(/password/i) as HTMLInputElement;
+  // Test 13-14: Save functionality for updates
+  describe('13-14. Update Record Functionality', () => {
+    it('13.1-13.4 should update record when save is clicked in update form', async () => {
+      vi.mocked(get).mockReturnValue(mockCustomers[0]);
+      vi.mocked(useParams).mockReturnValue({ id: '1' });
 
-    await userEvent.type(nameA, 'New User');
-    await userEvent.type(emailA, 'new@user.test');
-    await userEvent.type(passwordA, 'secret');
+      render(
+        <MemoryRouter>
+          <UpdateCustomer />
+        </MemoryRouter>
+      );
 
-    expect(nameA.value).toBe('New User');
-    expect(emailA.value).toBe('new@user.test');
-    expect(passwordA.value).toBe('secret');
+      await waitFor(() => {
+        expect(screen.getByDisplayValue('John Doe')).toBeInTheDocument();
+      });
 
-    // Update page: change existing values
-    await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
-    await userEvent.click(getRowByName('Alice'));
-    await userEvent.click(screen.getByRole('button', { name: /update customer/i }));
+      const nameInput = screen.getByLabelText(/name/i);
+      fireEvent.change(nameInput, { target: { value: 'John Updated' } });
+      
+      fireEvent.click(screen.getByRole('button', { name: /update customer/i }));
 
-    const nameU = screen.getByLabelText(/name/i) as HTMLInputElement;
-    const emailU = screen.getByLabelText(/email/i) as HTMLInputElement;
-    const passU = screen.getByLabelText(/password/i) as HTMLInputElement;
-
-    await userEvent.clear(nameU);
-    await userEvent.type(nameU, 'Alice Cooper');
-    await userEvent.clear(emailU);
-    await userEvent.type(emailU, 'acooper@example.org');
-    await userEvent.clear(passU);
-    await userEvent.type(passU, 'newpass');
-
-    expect(nameU.value).toBe('Alice Cooper');
-    expect(emailU.value).toBe('acooper@example.org');
-    expect(passU.value).toBe('newpass');
+      expect(vi.mocked(put)).toHaveBeenCalledWith(1, expect.objectContaining({
+        id: 1,
+        name: 'John Updated',
+        email: 'john@example.com',
+        password: 'password123'
+      }));
+    });
   });
 
-  // 13, 13.1-13.4.4, 14, 14.1
-  it('13-14: saving a modified record updates list, clears selection, and resets form/title', async () => {
-    // Select Charlie, open Update
-    await userEvent.click(getRowByName('Charlie'));
-    await userEvent.click(screen.getByRole('button', { name: /update customer/i }));
-    expect(screen.getByRole('heading', { name: /update customer/i })).toBeInTheDocument();
+  // Test 15-16: Cancel functionality
+  describe('15-16. Cancel Functionality', () => {
+    it('15.1-15.2 should navigate back when cancel is clicked', () => {
+      vi.mocked(useParams).mockReturnValue({ id: '4' });
 
-    // Modify email and submit
-    const emailInput = screen.getByLabelText(/email/i) as HTMLInputElement;
-    await userEvent.clear(emailInput);
-    await userEvent.type(emailInput, 'charlie+updated@example.com');
+      render(
+        <MemoryRouter>
+          <AddCustomer />
+        </MemoryRouter>
+      );
 
-    await userEvent.click(screen.getByRole('button', { name: /update customer/i }));
+      fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
+      expect(mockNavigate).toHaveBeenCalledWith('/');
+    });
 
-    // Back on list: updated value visible
-    const updatedRow = getRowByName('Charlie');
-    expect(within(updatedRow).getByText('charlie+updated@example.com')).toBeInTheDocument();
+    it('should show cancel button in update form', () => {
+      vi.mocked(get).mockReturnValue(mockCustomers[0]);
+      vi.mocked(useParams).mockReturnValue({ id: '1' });
 
-    // No selected rows
-    getTableBodyRows().forEach((r) => expect(r.classList.contains('selected-row')).toBe(false));
+      render(
+        <MemoryRouter>
+          <UpdateCustomer />
+        </MemoryRouter>
+      );
+
+      expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
+    });
   });
 
-  // 15, 15.1-15.2.3, 16, 16.1
-  it('15-16: cancel de-selects and form is empty when reopened', async () => {
-    await userEvent.click(getRowByName('Alice'));
-    await userEvent.click(screen.getByRole('button', { name: /update customer/i }));
-    await userEvent.click(screen.getByRole('button', { name: /cancel/i }));
+  // Test 17: New data entry when no record selected
+  describe('17. New Data Entry', () => {
+    it('17.1 should allow typing in add form when no record selected', () => {
+      vi.mocked(useParams).mockReturnValue({ id: '4' });
 
-    // No bold rows
-    getTableBodyRows().forEach((r) => expect(r.classList.contains('selected-row')).toBe(false));
+      render(
+        <MemoryRouter>
+          <AddCustomer />
+        </MemoryRouter>
+      );
 
-    // Reopen Add; fields empty (placeholders present, but we assert values empty)
-    await userEvent.click(screen.getByRole('button', { name: /add customer/i }));
-    expect((screen.getByLabelText(/name/i) as HTMLInputElement).value).toBe('');
-    expect((screen.getByLabelText(/email/i) as HTMLInputElement).value).toBe('');
-    expect((screen.getByLabelText(/password/i) as HTMLInputElement).value).toBe('');
+      const nameInput = screen.getByLabelText(/name/i);
+      const emailInput = screen.getByLabelText(/email/i);
+      const passwordInput = screen.getByLabelText(/password/i);
+
+      expect(nameInput).toHaveValue('');
+      expect(emailInput).toHaveValue('');
+      expect(passwordInput).toHaveValue('');
+
+      fireEvent.change(nameInput, { target: { value: 'Test Name' } });
+      expect(nameInput).toHaveValue('Test Name');
+    });
   });
 
-  // 17, 18, 19
-  it('17-19: saving with no selection adds a new record; list updates; no selection after save', async () => {
-    // Go to Add
-    await userEvent.click(screen.getByRole('button', { name: /add customer/i }));
+  // Test 18-19: Add new record functionality
+  describe('18-19. Add New Record Functionality', () => {
+    it('18.1-18.4 should add new record when save is clicked with new data', () => {
+      vi.mocked(useParams).mockReturnValue({ id: '4' });
 
-    // Fill and submit
-    await userEvent.type(screen.getByLabelText(/name/i), 'Dana');
-    await userEvent.type(screen.getByLabelText(/email/i), 'dana@example.com');
-    await userEvent.type(screen.getByLabelText(/password/i), 'p@ss4');
-    await userEvent.click(screen.getByRole('button', { name: /add customer/i }));
+      render(
+        <MemoryRouter>
+          <AddCustomer />
+        </MemoryRouter>
+      );
+      const nameInput = screen.getByLabelText(/name/i);
+      const emailInput = screen.getByLabelText(/email/i);
+      const passwordInput = screen.getByLabelText(/password/i);
 
-    // New row appears
-    const newRow = getRowByName('Dana');
-    expect(within(newRow).getByText('dana@example.com')).toBeInTheDocument();
-    expect(within(newRow).getByText('p@ss4')).toBeInTheDocument();
+      fireEvent.change(nameInput, { target: { value: 'New Customer' } });
+      fireEvent.change(emailInput, { target: { value: 'new@example.com' } });
+      fireEvent.change(passwordInput, { target: { value: 'newpass123' } });
 
-    // No selection remains
-    getTableBodyRows().forEach((r) => expect(r.classList.contains('selected-row')).toBe(false));
+      fireEvent.click(screen.getByRole('button', { name: /add customer/i }));
+
+      expect(vi.mocked(post)).toHaveBeenCalledWith(expect.objectContaining({
+        id: 4,
+        name: 'New Customer',
+        email: 'new@example.com',
+        password: 'newpass123'
+      }));
+    });
   });
-});*/
+
+  // Component rendering tests
+  describe('Component Rendering', () => {
+    it('should render DisplayCustomers component correctly', () => {
+      render(
+        <MemoryRouter>
+          <DisplayCustomers />
+        </MemoryRouter>
+      );
+
+      expect(screen.getByText('Customer List')).toBeInTheDocument();
+    });
+
+    it('should render AddCustomer component correctly', () => {
+      vi.mocked(useParams).mockReturnValue({ id: '4' });
+
+      render(
+        <MemoryRouter>
+          <AddCustomer />
+        </MemoryRouter>
+      );
+
+      expect(screen.getByTestId("add-customer-title")).toBeInTheDocument();
+    });
+
+    it('should render UpdateCustomer component correctly', () => {
+      vi.mocked(get).mockReturnValue(mockCustomers[0]);
+      vi.mocked(useParams).mockReturnValue({ id: '1' });
+
+      render(
+        <MemoryRouter>
+          <UpdateCustomer />
+        </MemoryRouter>
+      );
+
+      expect(screen.getByTestId("update-customer-title")).toBeInTheDocument();
+    });
+
+    it('should render DeleteCustomer component correctly', () => {
+      vi.mocked(get).mockReturnValue(mockCustomers[0]);
+      vi.mocked(useParams).mockReturnValue({ id: '1' });
+
+      render(
+        <MemoryRouter>
+          <DeleteCustomer />
+        </MemoryRouter>
+      );
+
+      expect(screen.getByText('Delete Customer')).toBeInTheDocument();
+    });
+  });
+
+  // Delete button state management
+  describe('Delete Button State Management', () => {
+    it('should disable delete button when no customer is selected', () => {
+      render(
+        <MemoryRouter>
+          <DisplayCustomers />
+        </MemoryRouter>
+      );
+
+      const deleteButton = screen.getByRole('button', { name: /delete customer/i });
+      expect(deleteButton).toBeDisabled();
+    });
+
+    it('should enable delete button when customer is selected', () => {
+      render(
+        <MemoryRouter>
+          <DisplayCustomers />
+        </MemoryRouter>
+      );
+
+      fireEvent.click(screen.getByText('John Doe'));
+      
+      const deleteButton = screen.getByRole('button', { name: /delete customer/i });
+      expect(deleteButton).not.toBeDisabled();
+    });
+  });
+
+  // Form validation
+  describe('Form Validation', () => {
+    it('should require all fields in add form', () => {
+      vi.mocked(useParams).mockReturnValue({ id: '4' });
+
+      render(
+        <MemoryRouter>
+          <AddCustomer />
+        </MemoryRouter>
+      );
+
+      const nameInput = screen.getByLabelText(/name/i);
+      const emailInput = screen.getByLabelText(/email/i);
+      const passwordInput = screen.getByLabelText(/password/i);
+
+      expect(nameInput).toHaveAttribute('required');
+      expect(emailInput).toHaveAttribute('required');
+      expect(passwordInput).toHaveAttribute('required');
+    });
+
+    it('should validate email format in forms', () => {
+      vi.mocked(useParams).mockReturnValue({ id: '4' });
+
+      render(
+        <MemoryRouter>
+          <AddCustomer />
+        </MemoryRouter>
+      );
+
+      const emailInput = screen.getByLabelText(/email/i);
+      expect(emailInput).toHaveAttribute('type', 'email');
+    });
+  });
+});

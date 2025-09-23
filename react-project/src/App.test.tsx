@@ -10,12 +10,10 @@ import UpdateCustomer from './components/UpdateCustomer';
 beforeEach(() => {
   global.fetch = vi.fn((url) => {
     if (url.includes('/customers/1')) {
-      // Single customer fetch for delete/update
       return Promise.resolve({
         json: () => Promise.resolve({ id: 1, name: 'John Doe', email: 'john@example.com', password: 'password123' })
       });
     }
-    // Default: customers list
     return Promise.resolve({
       json: () => Promise.resolve([
         { id: 1, name: 'John Doe', email: 'john@example.com', password: 'password123' },
@@ -29,7 +27,6 @@ afterEach(() => {
   vi.resetAllMocks();
 });
 
-// Helper component that mimics App structure but uses MemoryRouter
 const TestApp = ({ initialEntries = ['/'] }) => (
   <MemoryRouter initialEntries={initialEntries}>
     <div className="App">

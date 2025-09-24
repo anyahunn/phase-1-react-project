@@ -10,173 +10,251 @@ vi.mock('../../../ProjectAssets/memdb.js', () => ({
   put: vi.fn(),
 }));
 
+const mockNavigate = vi.fn();
 vi.mock('react-router-dom', async (importOriginal: any) => {
   const actual = await importOriginal();
   return {
     ...actual,
-    useNavigate: vi.fn(() => vi.fn()),
+    useNavigate: () => mockNavigate,
     useParams: vi.fn(),
   };
 });
 
 import * as memdb from '../../../ProjectAssets/memdb.js';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+
+const renderWithRouter = (component: React.ReactElement) => {
+  return render(<MemoryRouter>{component}</MemoryRouter>);
+};
+
+const mockCustomer = {
+  id: 1,
+  name: 'John Doe',
+  email: 'john@example.com',
+  password: 'password123'
+};
+
+const mockCustomerZero = {
+  id: 0,
+  name: 'Zero Customer',
+  email: 'zero@example.com',
+  password: 'zeropass'
+};
 
 describe('UpdateCustomer Component', () => {
-  const mockNavigate = vi.fn();
-  
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(useNavigate).mockReturnValue(mockNavigate);
+    mockNavigate.mockReset();
+    vi.mocked(memdb.get).mockReset();
+    vi.mocked(memdb.put).mockReset();
+    vi.mocked(useParams).mockReset();
   });
 
-  it('renders form with empty fields when customer is not found', () => {
-    vi.mocked(useParams).mockReturnValue({ id: '999' });
-    vi.mocked(memdb.get).mockReturnValue(null);
+  describe('Standalone Usage', () => {
+    test('renders form with correct structure', () => {
+      vi.mocked(useParams).mockReturnValue({ id: '1' });
+      vi.mocked(memdb.get).mockReturnValue(mockCustomer);
 
-    render(
-      <MemoryRouter>
-        <UpdateCustomer />
-      </MemoryRouter>
-    );
+      renderWithRouter(<UpdateCustomer />);
 
-    expect(screen.getByLabelText(/name/i)).toHaveValue('');
-    expect(screen.getByLabelText(/email/i)).toHaveValue('');
-    expect(screen.getByLabelText(/password/i)).toHaveValue('');
-    expect(screen.getByRole('button', { name: /update customer/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
-  });
-
-  it('renders form with existing customer data and handles input changes', async () => {
-    const existingCustomer = {
-      id: 1,
-      name: 'John Doe',
-      email: 'john@example.com',
-      password: 'password123'
-    };
-    
-    vi.mocked(useParams).mockReturnValue({ id: '1' });
-    vi.mocked(memdb.get).mockReturnValue(existingCustomer);
-
-    render(
-      <MemoryRouter>
-        <UpdateCustomer />
-      </MemoryRouter>
-    );
-
-    await waitFor(() => {
-      expect(screen.getByLabelText(/name/i)).toHaveValue('John Doe');
-      expect(screen.getByLabelText(/email/i)).toHaveValue('john@example.com');
-      expect(screen.getByLabelText(/password/i)).toHaveValue('password123');
+      expect(screen.getByTestId('update-customer-title')).toHaveTextContent('Update Customer');
+      expect(screen.getByTestId('update-customer-form')).toBeInTheDocument();
+      expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+      expect(screen.getByTestId('update-customer-button')).toBeInTheDocument();
+      expect(screen.getByText('Cancel')).toBeInTheDocument();
     });
 
-    fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'John Updated' } });
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'john.updated@example.com' } });
-    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'newpassword' } });
+    test('loads and displays existing customer data', async () => {
+      vi.mocked(useParams).mockReturnValue({ id: '1' });
+      vi.mocked(memdb.get).mockReturnValue(mockCustomer);
 
-    expect(screen.getByLabelText(/name/i)).toHaveValue('John Updated');
-    expect(screen.getByLabelText(/email/i)).toHaveValue('john.updated@example.com');
-    expect(screen.getByLabelText(/password/i)).toHaveValue('newpassword');
-  });
+      renderWithRouter(<UpdateCustomer />);
 
-  it('calls memdb.put and navigates on form submission', async () => {
-    const existingCustomer = {
-      id: 2,
-      name: 'Bob Wilson',
-      email: 'bob@example.com',
-      password: 'bobpass'
-    };
-    
-    vi.mocked(useParams).mockReturnValue({ id: '2' });
-    vi.mocked(memdb.get).mockReturnValue(existingCustomer);
+      expect(memdb.get).toHaveBeenCalledWith(1);
 
-    render(
-      <MemoryRouter>
-        <UpdateCustomer />
-      </MemoryRouter>
-    );
-
-    await waitFor(() => {
-      expect(screen.getByLabelText(/name/i)).toHaveValue('Bob Wilson');
+      await waitFor(() => {
+        expect(screen.getByLabelText(/name/i)).toHaveValue('John Doe');
+        expect(screen.getByLabelText(/email/i)).toHaveValue('john@example.com');
+        expect(screen.getByLabelText(/password/i)).toHaveValue('password123');
+      });
     });
 
-    fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Bob Updated' } });
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'bob.updated@example.com' } });
-    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'newbobpass' } });
+    test('handles input changes correctly', async () => {
+      vi.mocked(useParams).mockReturnValue({ id: '1' });
+      vi.mocked(memdb.get).mockReturnValue(mockCustomer);
 
-    fireEvent.click(screen.getByRole('button', { name: /update customer/i }));
+      renderWithRouter(<UpdateCustomer />);
 
-    expect(vi.mocked(memdb.put)).toHaveBeenCalledWith(2, {
-      id: 2,
-      name: 'Bob Updated',
-      email: 'bob.updated@example.com',
-      password: 'newbobpass'
-    });
-    expect(mockNavigate).toHaveBeenCalledWith('/');
-  });
+      await waitFor(() => {
+        expect(screen.getByLabelText(/name/i)).toHaveValue('John Doe');
+      });
 
-  it('navigates back when cancel is clicked', () => {
-    vi.mocked(useParams).mockReturnValue({ id: '1' });
-    vi.mocked(memdb.get).mockReturnValue(null);
+      fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'John Updated' } });
+      fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'john.updated@example.com' } });
+      fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'newpassword' } });
 
-    render(
-      <MemoryRouter>
-        <UpdateCustomer />
-      </MemoryRouter>
-    );
-
-    fireEvent.click(screen.getByRole('button', { name: /cancel/i }));
-    expect(mockNavigate).toHaveBeenCalledWith('/');
-  });
-
-  it('prevents form submission with empty required fields', async () => {
-    vi.mocked(useParams).mockReturnValue({ id: '1' });
-    vi.mocked(memdb.get).mockReturnValue(null);
-
-    render(
-      <MemoryRouter>
-        <UpdateCustomer />
-      </MemoryRouter>
-    );
-
-    fireEvent.click(screen.getByRole('button', { name: /update customer/i }));
-
-    expect(vi.mocked(memdb.put)).not.toHaveBeenCalled();
-    expect(mockNavigate).not.toHaveBeenCalled();
-  });
-
-  it('handles string ID parameter correctly and preserves ID', async () => {
-    const existingCustomer = {
-      id: 7,
-      name: 'Alice Brown',
-      email: 'alice@example.com',
-      password: 'alicepass'
-    };
-    
-    vi.mocked(useParams).mockReturnValue({ id: '7' });
-    vi.mocked(memdb.get).mockReturnValue(existingCustomer);
-
-    render(
-      <MemoryRouter>
-        <UpdateCustomer />
-      </MemoryRouter>
-    );
-
-    expect(vi.mocked(memdb.get)).toHaveBeenCalledWith(7);
-
-    await waitFor(() => {
-      expect(screen.getByLabelText(/name/i)).toHaveValue('Alice Brown');
+      expect(screen.getByLabelText(/name/i)).toHaveValue('John Updated');
+      expect(screen.getByLabelText(/email/i)).toHaveValue('john.updated@example.com');
+      expect(screen.getByLabelText(/password/i)).toHaveValue('newpassword');
     });
 
-    fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Alice Updated' } });
+    test('submits updated data and navigates', async () => {
+      vi.mocked(useParams).mockReturnValue({ id: '1' });
+      vi.mocked(memdb.get).mockReturnValue(mockCustomer);
 
-    fireEvent.click(screen.getByRole('button', { name: /update customer/i }));
+      renderWithRouter(<UpdateCustomer />);
 
-    expect(vi.mocked(memdb.put)).toHaveBeenCalledWith(7, {
-      id: 7,
-      name: 'Alice Updated',
-      email: 'alice@example.com',
-      password: 'alicepass'
+      await waitFor(() => {
+        expect(screen.getByLabelText(/name/i)).toHaveValue('John Doe');
+      });
+
+      fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'John Updated' } });
+      fireEvent.click(screen.getByTestId('update-customer-button'));
+
+      expect(memdb.put).toHaveBeenCalledWith(1, {
+        id: 1,
+        name: 'John Updated',
+        email: 'john@example.com',
+        password: 'password123'
+      });
+      expect(mockNavigate).toHaveBeenCalledWith('/');
+    });
+
+    test('navigates when cancel is clicked', () => {
+      vi.mocked(useParams).mockReturnValue({ id: '1' });
+      vi.mocked(memdb.get).mockReturnValue(mockCustomer);
+
+      renderWithRouter(<UpdateCustomer />);
+
+      fireEvent.click(screen.getByText('Cancel'));
+      expect(mockNavigate).toHaveBeenCalledWith('/');
+      expect(memdb.put).not.toHaveBeenCalled();
+    });
+
+    test('handles customer not found scenario', () => {
+      vi.mocked(useParams).mockReturnValue({ id: '999' });
+      vi.mocked(memdb.get).mockReturnValue(null);
+
+      renderWithRouter(<UpdateCustomer />);
+
+      expect(screen.getByLabelText(/name/i)).toHaveValue('');
+      expect(screen.getByLabelText(/email/i)).toHaveValue('');
+      expect(screen.getByLabelText(/password/i)).toHaveValue('');
+    });
+  });
+
+  describe('Embedded Usage (with props)', () => {
+    test('uses customerId prop instead of URL param', async () => {
+      vi.mocked(useParams).mockReturnValue({});
+      vi.mocked(memdb.get).mockReturnValue(mockCustomer);
+
+      renderWithRouter(<UpdateCustomer customerId={1} />);
+
+      expect(memdb.get).toHaveBeenCalledWith(1);
+      
+      await waitFor(() => {
+        expect(screen.getByLabelText(/name/i)).toHaveValue('John Doe');
+      });
+    });
+
+    test('handles customer ID 0 correctly with nullish coalescing', async () => {
+      vi.mocked(useParams).mockReturnValue({});
+      vi.mocked(memdb.get).mockReturnValue(mockCustomerZero);
+
+      renderWithRouter(<UpdateCustomer customerId={0} />);
+
+      // Should call memdb.get with 0, not fall back to NaN
+      expect(memdb.get).toHaveBeenCalledWith(0);
+      
+      await waitFor(() => {
+        expect(screen.getByLabelText(/name/i)).toHaveValue('Zero Customer');
+        expect(screen.getByLabelText(/email/i)).toHaveValue('zero@example.com');
+      });
+    });
+
+    test('calls onCustomerUpdated callback instead of navigating', async () => {
+      const mockOnCustomerUpdated = vi.fn();
+      vi.mocked(useParams).mockReturnValue({});
+      vi.mocked(memdb.get).mockReturnValue(mockCustomer);
+
+      renderWithRouter(<UpdateCustomer customerId={1} onCustomerUpdated={mockOnCustomerUpdated} />);
+
+      await waitFor(() => {
+        expect(screen.getByLabelText(/name/i)).toHaveValue('John Doe');
+      });
+
+      fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'Updated Name' } });
+      fireEvent.click(screen.getByTestId('update-customer-button'));
+
+      expect(mockOnCustomerUpdated).toHaveBeenCalled();
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
+    test('calls onCancel callback instead of navigating', () => {
+      const mockOnCancel = vi.fn();
+      vi.mocked(useParams).mockReturnValue({});
+      vi.mocked(memdb.get).mockReturnValue(mockCustomer);
+
+      renderWithRouter(<UpdateCustomer customerId={1} onCancel={mockOnCancel} />);
+
+      fireEvent.click(screen.getByText('Cancel'));
+
+      expect(mockOnCancel).toHaveBeenCalled();
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
+    test('prioritizes prop ID over URL param when both are provided', async () => {
+      vi.mocked(useParams).mockReturnValue({ id: '999' });
+      vi.mocked(memdb.get).mockReturnValue(mockCustomer);
+
+      renderWithRouter(<UpdateCustomer customerId={1} />);
+
+      // Should use customerId prop (1), not URL param (999)
+      expect(memdb.get).toHaveBeenCalledWith(1);
+      expect(memdb.get).not.toHaveBeenCalledWith(999);
+    });
+
+    test('falls back to URL param when customerId prop is undefined', async () => {
+      vi.mocked(useParams).mockReturnValue({ id: '5' });
+      vi.mocked(memdb.get).mockReturnValue(mockCustomer);
+
+      renderWithRouter(<UpdateCustomer customerId={undefined} />);
+
+      expect(memdb.get).toHaveBeenCalledWith(5);
+    });
+  });
+
+  describe('Edge Cases', () => {
+    test('handles string ID parameter conversion', async () => {
+      vi.mocked(useParams).mockReturnValue({ id: '42' });
+      const customer42 = { ...mockCustomer, id: 42 };
+      vi.mocked(memdb.get).mockReturnValue(customer42);
+
+      renderWithRouter(<UpdateCustomer />);
+
+      expect(memdb.get).toHaveBeenCalledWith(42);
+      
+      await waitFor(() => {
+        expect(screen.getByLabelText(/name/i)).toHaveValue('John Doe');
+      });
+
+      fireEvent.click(screen.getByTestId('update-customer-button'));
+
+      expect(memdb.put).toHaveBeenCalledWith(42, expect.objectContaining({ id: 42 }));
+    });
+
+    test('prevents submission with empty form', () => {
+      vi.mocked(useParams).mockReturnValue({ id: '1' });
+      vi.mocked(memdb.get).mockReturnValue(null);
+
+      renderWithRouter(<UpdateCustomer />);
+
+      fireEvent.click(screen.getByTestId('update-customer-button'));
+
+      // HTML5 validation should prevent submission, so memdb.put shouldn't be called
+      expect(memdb.put).not.toHaveBeenCalled();
     });
   });
 });

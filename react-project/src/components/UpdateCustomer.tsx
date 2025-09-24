@@ -11,7 +11,7 @@ interface UpdateCustomerProps {
 
 function UpdateCustomer({ customerId: propId, onCustomerUpdated, onCancel }: UpdateCustomerProps = {}) {
     const { id: paramId } = useParams();
-    const id = propId || Number(paramId);
+    const id = propId ?? Number(paramId);
     const navigate = useNavigate();
     const [customer, setCustomer] = useState({ id: Number(id), name: '', email: '', password: '' });
 
@@ -90,7 +90,7 @@ function UpdateCustomer({ customerId: propId, onCustomerUpdated, onCancel }: Upd
                         required
                     />
                 </div>
-                <button data-testid="submit-button" className="submit-button" type="submit">Update Customer</button>
+                <button data-testid="update-customer-button" className="submit-button" type="submit">Update Customer</button>
             </form>
             <button className="button-cancel" onClick={cancel}>Cancel</button>
         </div>

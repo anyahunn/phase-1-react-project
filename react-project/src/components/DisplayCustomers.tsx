@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import { getAll } from '../../../ProjectAssets/memdb.js';
+import AddCustomer from './AddCustomer';
+import UpdateCustomer from './UpdateCustomer';
 import './DisplayCustomers.css';
 
 interface Customer {
@@ -10,12 +11,28 @@ interface Customer {
 	password: string;
 }
 
-const DisplayCustomers: React.FC<{ customers: Customer[], customer: Customer | null }> = ({ customers, customer }) => {
-	const navigate = useNavigate();
-	//const [customers, setCustomers] = useState<Customer[]>([]); Use for v2 and v3
-	const [selectedCustomer, setSelectedCustomer] = useState<number | null>(null);
-    const buttonText = selectedCustomer ? "Update Customer" : "Add Customer";
-	const buttonText2 = "Delete Customer";
+interface DisplayCustomersProps {
+	customers: Customer[];
+	addCustomer: (customer: Customer) => void;
+	updateCustomer: (customer: Customer) => void;
+	deleteCustomer: (id: number) => void;
+	findHighestId: () => number;
+}
+
+const DisplayCustomers: React.FC<DisplayCustomersProps> = ({ 
+	customers, 
+	addCustomer, 
+	updateCustomer, 
+	deleteCustomer, 
+	findHighestId 
+}) => {
+	const [selectedCustomer, setSelectedCustomer] = useState<number>(-1);
+	const [refreshKey, setRefreshKey] = useState<number>(0);
+
+	const refreshCustomers = () => {
+		setRefreshKey(prev => prev + 1);
+		setSelectedCustomer(-1);
+	};
     //Dont use this until v3 
 	// useEffect(() => {
 	// 	fetch('http://localhost:4000/customers')
@@ -55,7 +72,7 @@ const DisplayCustomers: React.FC<{ customers: Customer[], customer: Customer | n
 							<tr data-testid={`customer-row-${customer.id}`}
 								key={customer.id}
 								className={isSelected ? 'selected-row' : ''}
-								onClick={() => setSelectedCustomer(isSelected ? null : customer.id)}
+								onClick={() => setSelectedCustomer(isSelected ? -1 : customer.id)}
 							>
 								<td>{customer.id}</td>
 								<td>{customer.name}</td>
@@ -68,35 +85,47 @@ const DisplayCustomers: React.FC<{ customers: Customer[], customer: Customer | n
 			</table>
             
 			<button
-				className="add-customer-btn"
+				className="delete-customer-btn"
+				data-testid="delete-customer-button"
 				onClick={() => {
-					if (selectedCustomer) {
-                        console.log(customers.length);
-						navigate(`/update_customer/${selectedCustomer}`);
-					} else {
-                        console.log(customers.length);
-						navigate(`/add_customer/${customers.length + 1}`);
+					if (selectedCustomer !== -1) {
+						deleteCustomer(selectedCustomer);
+						refreshCustomers();
 					}
 				}}
+				disabled={selectedCustomer === -1}
+				style={{
+					backgroundColor: selectedCustomer === -1 ? '#ccc' : '',
+					cursor: selectedCustomer === -1 ? 'not-allowed' : 'pointer'
+				}}
 			>
-				{buttonText}
+				Delete Customer
 			</button>
 
-			<button
-				className="delete-customer-btn"
-				onClick={() => {
-					if (selectedCustomer) {
-						navigate(`/delete_customer/${selectedCustomer}`);
-					}
-				}}
-				disabled={!selectedCustomer}
-				style={{
-                    backgroundColor: !selectedCustomer ? '#ccc' : '',
-                    cursor: !selectedCustomer ? 'not-allowed' : 'pointer'
-                }}
-			>
-				{buttonText2}
-			</button>
+			<div style={{ marginTop: '20px' }}>
+				{selectedCustomer !== -1 ? (
+					<UpdateCustomer 
+						key={`update-${selectedCustomer}-${refreshKey}`}
+						customers={customers}
+						updateCustomer={(customer: Customer) => {
+							updateCustomer(customer);
+							refreshCustomers();
+						}}
+						customerId={selectedCustomer}
+						onCancel={() => setSelectedCustomer(-1)}
+					/>
+				) : (
+					<AddCustomer 
+						key={`add-${findHighestId()}-${refreshKey}`}
+						id={findHighestId()}
+						addCustomer={(customer: Customer) => {
+							addCustomer(customer);
+							refreshCustomers();
+						}}
+						onCancel={() => {}}
+					/>
+				)}
+			</div>
 		</div>
 	);
 };

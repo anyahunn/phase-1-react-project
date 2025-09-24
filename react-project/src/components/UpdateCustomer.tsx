@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import './UpdateCustomer.css';
 
 function UpdateCustomer(props: any) {
-    const navigate = useNavigate();
-    const { id } = useParams();
-    const customerId = Number(id);
-    const selectedCustomer = props.customers.find((c: any) => c.id === customerId);
+    const { customerId, onCancel, updateCustomer, customers } = props;
+    const selectedCustomer = customers.find((c: any) => c.id === customerId);
     const [customer, setCustomer] = useState(selectedCustomer || {id: customerId, name: '', email: '', password: ''});
+    
     const cancel = () => {
-        navigate('/');
+        if (onCancel) {
+            onCancel();
+        }
     }
 
     useEffect(() => {
@@ -26,8 +26,7 @@ function UpdateCustomer(props: any) {
             email: customer.email,
             password: customer.password
         };
-        props.updateCustomer(updatedCustomer);
-        navigate('/');
+        updateCustomer(updatedCustomer);
     };
 
     return(

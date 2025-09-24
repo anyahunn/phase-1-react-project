@@ -1,25 +1,27 @@
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import './AddCustomer.css';
 
 function AddCustomer(props: any) {
-    const {id} = useParams();
-    const [customer, setCustomer] = useState({id:id, name:"", email:"", password:""});
-    const navigate = useNavigate();
+    const { id, onCancel, addCustomer } = props;
+    const [customer, setCustomer] = useState({id: id, name: "", email: "", password: ""});
+    
     const cancel = () => {
-        navigate('/');
+        if (onCancel) {
+            onCancel();
+        }
     };
+    
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Generate a new id if needed
         const newCustomer = {
-            id: Number(id), // or use a better id logic
+            id: Number(id),
             name: customer.name,
             email: customer.email,
             password: customer.password
         };
-        props.addCustomer(newCustomer);
-        navigate('/'); // or '/displayCustomers' if that's your route
+        addCustomer(newCustomer);
+        // Clear form after submission
+        setCustomer({id: id, name: "", email: "", password: ""});
     };
     return(
         <div className='page'>

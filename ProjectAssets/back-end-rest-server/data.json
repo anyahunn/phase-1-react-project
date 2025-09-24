@@ -1,23 +1,40 @@
 {
   "customers": [
     {
-      "id": 0,
-      "name": "Mary Jackson",
-      "email": "maryj@abc.com",
-      "password": "maryj"
-    },
-    {
-      "id": 1,      
+      "id": 1,
       "name": "Karen Addams",
       "email": "karena@abc.com",
       "password": "karena"
     },
     {
-      "id": 2,
-      "name": "Scott Ramsey",
-      "email": "scottr@abc.com",
-      "password": "scottr"
+      "name": "Luke Chester",
+      "email": "luke@yahoo.com",
+      "password": "test",
+      "id": 2
+    },
+    {
+      "name": "Steve Young",
+      "email": "Steve@yahoo.com",
+      "password": "Steve",
+      "id": 3
+    },
+    {
+      "name": "John Lennon",
+      "email": "John@test.com",
+      "password": "johnlennon",
+      "id": 4
+    },
+    {
+      "name": "Mike Tyson",
+      "email": "mike@test.com",
+      "password": "12345",
+      "id": 5
+    },
+    {
+      "id": 6,
+      "name": "Billy Rogers2",
+      "email": "billy@yahoo.com",
+      "password": "billy"
     }
   ]
-
 }

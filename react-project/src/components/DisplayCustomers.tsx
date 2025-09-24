@@ -56,8 +56,8 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
 								className={isSelected ? 'selected-row' : ''}
 								onClick={() => setSelectedCustomer(isSelected ? -1 : customer.id)}
 							>
-								<td>{customer.id}</td>
-								<td>{customer.name}</td>
+								<td >{customer.id}</td>
+								<td data-testid={`customer-name-${customer.id}`}>{customer.name}</td>
 								<td>{customer.email}</td>
 								<td>{customer.password}</td>
 							</tr>
@@ -68,12 +68,11 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
             
 			<button
 				className="delete-customer-btn"
+				data-testid="delete-customer-button"
 				onClick={() => {
 					if (selectedCustomer != -1) {
                         console.log(selectedCustomer);
 						navigate(`/delete_customer/${selectedCustomer}`);
-					} else {
-                        console.log(customers.length);
 					}
 				}}
 				disabled={selectedCustomer == -1}

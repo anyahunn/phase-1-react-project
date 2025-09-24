@@ -15,7 +15,7 @@ function DeleteCustomer() {
 
     const handleDelete = () => {
         memdb.deleteById(customerId);
-        navigate('/'); // Go back to DisplayCustomers
+        navigate('/'); 
     };
 
     if (!customer) {
@@ -44,7 +44,7 @@ function DeleteCustomer() {
               <span className="text">{customer.password}</span>
             </div>
             <div className="button-group">
-              <button className="button" onClick={handleDelete}>Confirm Delete</button>
+              <button className="button" onClick={handleDelete} data-testid="confirm-delete-button">Confirm Delete</button>
               <button className="button cancel" onClick={() => navigate('/')}>Cancel</button>
             </div>
           </div>

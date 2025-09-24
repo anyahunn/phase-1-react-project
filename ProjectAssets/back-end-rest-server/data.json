@@ -13,10 +13,10 @@
       "password": "karena"
     },
     {
-      "id": 2,
-      "name": "Scott Ramsey",
-      "email": "scottr@abc.com",
-      "password": "scottr"
+      "name": "Luke Chester",
+      "email": "luke@yahoo.com",
+      "password": "test",
+      "id": 2
     }
   ]
 }

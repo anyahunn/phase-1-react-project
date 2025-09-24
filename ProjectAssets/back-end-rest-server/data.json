@@ -29,6 +29,12 @@
       "email": "mike@test.com",
       "password": "12345",
       "id": 5
+    },
+    {
+      "id": 6,
+      "name": "Billy Rogers2",
+      "email": "billy@yahoo.com",
+      "password": "billy"
     }
   ]
 }

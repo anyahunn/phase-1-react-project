@@ -34,10 +34,6 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
     fetchCustomers();
   }, []);
 
-  useEffect(() => {
-    setFilteredCustomers(customers);
-  }, [customers]);
-
   const fetchCustomers = () => {
     fetch("http://localhost:4000/customers")
       .then((res) => res.json())

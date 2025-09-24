@@ -1,109 +1,65 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import { test, expect, describe } from 'vitest';
-import { useState } from 'react';
 import App from './App';
-import DisplayCustomers from './components/DisplayCustomers';
-import AddCustomer from './components/AddCustomer';
-import DeleteCustomer from './components/DeleteCustomer';
-import UpdateCustomer from './components/UpdateCustomer';
-
-// Create a testable version that mirrors App.tsx exactly
-const TestableApp = ({ initialEntries = ['/'] }: { initialEntries?: string[] }) => {
-  const [customers, setCustomers] = useState([
-    { id: 1, name: 'John Doe', email: 'john@example.com', password: 'password123' },
-    { id: 2, name: 'Jane Smith', email: 'jane@example.com', password: 'password456' },
-    { id: 3, name: 'Alice Johnson', email: 'alice@example.com', password: 'password789' }
-  ]);
-
-  const addCustomer = (newCustomer: any) => {
-    setCustomers(prev => [...prev, newCustomer]);
-  };
-
-  const updateCustomer = (updatedCustomer: any) => {
-    setCustomers(prev =>
-      prev.map(c => c.id === updatedCustomer.id ? updatedCustomer : c)
-    );
-  };
-
-  const deleteCustomer = (id: number) => {
-    setCustomers(prev => prev.filter(c => c.id !== id));
-  };
-
-  const findHighestId = () => {
-    return customers.reduce((maxId, customer) => Math.max(maxId, customer.id), 0) + 1;
-  };
-
-  return (
-    <MemoryRouter initialEntries={initialEntries}>
-      <div className="App">
-        <Routes>
-          <Route path="/" element={<DisplayCustomers customers={customers} customer={null} />} />
-          <Route path="/add_customer/:id" element={<AddCustomer id={findHighestId()} addCustomer={addCustomer} />} />
-          <Route path="/delete_customer/:id" element={<DeleteCustomer customers={customers} deleteCustomer={deleteCustomer}/>} />
-          <Route path="/update_customer/:id" element={<UpdateCustomer customers={customers} updateCustomer={updateCustomer} />} />
-        </Routes>
-      </div>
-    </MemoryRouter>
-  );
-};
 
 describe('App Component', () => {
   test('renders main App component without crashing', () => {
     render(<App />);
+    expect(screen.getByText('Customer Management System')).toBeInTheDocument();
+  });
+
+  test('renders DisplayCustomers component', () => {
+    render(<App />);
     expect(screen.getByText('Customer List')).toBeInTheDocument();
   });
 
-  test('renders default route with DisplayCustomers component', () => {
-    render(<TestableApp initialEntries={['/']} />);
-    expect(screen.getByText('Customer List')).toBeInTheDocument();
+  test('renders initial customers', () => {
+    render(<App />);
     expect(screen.getByText('John Doe')).toBeInTheDocument();
-    expect(screen.getByTestId('customer-table')).toBeInTheDocument();
+    expect(screen.getByText('Jane Smith')).toBeInTheDocument();
+    expect(screen.getByText('Alice Johnson')).toBeInTheDocument();
   });
 
-  test('navigates to add customer route and exercises addCustomer function', () => {
-    render(<TestableApp initialEntries={['/add_customer/4']} />);
-    expect(screen.getByTestId('add-customer-title')).toBeInTheDocument();
-    expect(screen.getByTestId('add-customer-form')).toBeInTheDocument();
-  });
-
-  test('navigates to update customer route and exercises updateCustomer function', () => {
-    render(<TestableApp initialEntries={['/update_customer/1']} />);
-    expect(screen.getByTestId('update-customer-title')).toBeInTheDocument();
-    expect(screen.getByTestId('update-customer-form')).toBeInTheDocument();
-  });
-
-  test('navigates to delete customer route and exercises deleteCustomer function', () => {
-    render(<TestableApp initialEntries={['/delete_customer/1']} />);
+  test('renders delete button', () => {
+    render(<App />);
     expect(screen.getByText('Delete Customer')).toBeInTheDocument();
-    expect(screen.getByTestId('confirm-delete-button')).toBeInTheDocument();
   });
 
-  test('handles invalid routes gracefully', () => {
-    render(<TestableApp initialEntries={['/invalid-route']} />);
-    expect(screen.queryByText('Customer List')).not.toBeInTheDocument();
-    expect(screen.queryByText('Add Customer')).not.toBeInTheDocument();
-    expect(screen.queryByText('Update Customer')).not.toBeInTheDocument();
-    expect(screen.queryByText('Delete Customer')).not.toBeInTheDocument();
-  });
-
-  test('App component functions coverage through TestableApp', () => {
-    // Test default route
-    render(<TestableApp initialEntries={['/']} />);
-    expect(screen.getByText('Customer List')).toBeInTheDocument();
-    expect(screen.getByText('John Doe')).toBeInTheDocument();
-    
-    // Test add customer route (exercises findHighestId and addCustomer)
-    render(<TestableApp initialEntries={['/add_customer/4']} />);
+  test('renders add customer form by default (no customer selected)', () => {
+    render(<App />);
+    expect(screen.getAllByText('Add Customer')).toHaveLength(2);
     expect(screen.getByTestId('add-customer-form')).toBeInTheDocument();
+  });
+
+  test('shows update form when customer is selected', () => {
+    render(<App />);
     
-    // Test update customer route (exercises updateCustomer)
-    render(<TestableApp initialEntries={['/update_customer/1']} />);
+    // Click on a customer row to select it
+    const customerRow = screen.getByTestId('customer-row-1');
+    fireEvent.click(customerRow);
+    
+    // Should now show update customer form
+    expect(screen.getAllByText('Update Customer')).toHaveLength(2);
     expect(screen.getByTestId('update-customer-form')).toBeInTheDocument();
+  });
+
+  test('customer table is interactive', () => {
+    render(<App />);
     
-    // Test delete customer route (exercises deleteCustomer)
-    render(<TestableApp initialEntries={['/delete_customer/1']} />);
-    expect(screen.getByTestId('confirm-delete-button')).toBeInTheDocument();
+    const customerTable = screen.getByTestId('customer-table');
+    expect(customerTable).toBeInTheDocument();
+    
+    // All customer rows should be present
+    expect(screen.getByTestId('customer-row-1')).toBeInTheDocument();
+    expect(screen.getByTestId('customer-row-2')).toBeInTheDocument();
+    expect(screen.getByTestId('customer-row-3')).toBeInTheDocument();
+  });
+
+  test('delete button is disabled when no customer selected', () => {
+    render(<App />);
+    
+    const deleteButton = screen.getByTestId('delete-customer-button');
+    expect(deleteButton).toBeDisabled();
   });
 });

@@ -1,83 +1,142 @@
-import './DisplayCustomers';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { BrowserRouter as Router } from 'react-router-dom';
 import DisplayCustomers from './DisplayCustomers';
-import React from 'react';
 import { beforeAll, describe, expect, test, vi } from 'vitest';
 
-const mockNavigate = vi.fn();
-vi.mock('react-router-dom', async () => {
-    const actual = await vi.importActual('react-router-dom');
-    return {
-        ...actual,
-        useNavigate: () => mockNavigate,
-    };
-});
-
-let mockCustomers: any[]; 
-
 describe('DisplayCustomers Component', () => {
+    const mockCustomers = [
+        { id: 1, name: 'John Doe', email: 'john@example.com', password: 'password123' },
+        { id: 2, name: 'Jane Smith', email: 'jane@example.com', password: 'password456' }
+    ];
+    
+    const mockAddCustomer = vi.fn();
+    const mockUpdateCustomer = vi.fn();
+    const mockDeleteCustomer = vi.fn();
+    const mockFindHighestId = vi.fn(() => 3);
+
     beforeAll(() => {
-        mockCustomers = [
-            { id: 1, name: 'John Doe', email: 'john@example.com' },
-            { id: 2, name: 'Jane Smith', email: 'jane@example.com' }
-        ];
         vi.clearAllMocks();
     });
 
-    test('renders customer list and handles row selection', () => {
+    test('renders customer list with proper data', () => {
         render(
-            <Router>
-                <DisplayCustomers customers={mockCustomers} customer={null} />
-            </Router>
+            <DisplayCustomers 
+                customers={mockCustomers}
+                addCustomer={mockAddCustomer}
+                updateCustomer={mockUpdateCustomer}
+                deleteCustomer={mockDeleteCustomer}
+                findHighestId={mockFindHighestId}
+            />
         );
 
-        // Test rendering
-        const customerElements = screen.getAllByTestId(/customer-row-\d+/);
-        expect(customerElements).toHaveLength(mockCustomers.length);
-        expect(customerElements[0]).toHaveTextContent('John Doe');
-        expect(customerElements[1]).toHaveTextContent('Jane Smith');
-
-        // Test row selection/deselection
-        const firstRow = screen.getByTestId('customer-row-1');
-        fireEvent.click(firstRow);
-        expect(firstRow).toHaveClass('selected-row');
-        fireEvent.click(firstRow);
-        expect(firstRow).not.toHaveClass('selected-row');
+        expect(screen.getByText('Customer List')).toBeInTheDocument();
+        expect(screen.getByTestId('customer-table')).toBeInTheDocument();
+        expect(screen.getByText('John Doe')).toBeInTheDocument();
+        expect(screen.getByText('Jane Smith')).toBeInTheDocument();
     });
 
-    test('navigates to add customer when no row is selected', () => {
+    test('renders customer rows with correct test IDs', () => {
         render(
-            <Router>
-                <DisplayCustomers customers={mockCustomers} customer={null} />
-            </Router>
+            <DisplayCustomers 
+                customers={mockCustomers}
+                addCustomer={mockAddCustomer}
+                updateCustomer={mockUpdateCustomer}
+                deleteCustomer={mockDeleteCustomer}
+                findHighestId={mockFindHighestId}
+            />
         );
-        
-        const addButton = screen.getByText('Add Customer');
-        fireEvent.click(addButton);
-        expect(mockNavigate).toHaveBeenCalledWith('/add_customer/3');
+
+        expect(screen.getByTestId('customer-row-1')).toBeInTheDocument();
+        expect(screen.getByTestId('customer-row-2')).toBeInTheDocument();
     });
 
-    test('navigates to update and delete customer when row is selected', () => {
+    test('shows AddCustomer form by default (no customer selected)', () => {
         render(
-            <Router>
-                <DisplayCustomers customers={mockCustomers} customer={null} />
-            </Router>
+            <DisplayCustomers 
+                customers={mockCustomers}
+                addCustomer={mockAddCustomer}
+                updateCustomer={mockUpdateCustomer}
+                deleteCustomer={mockDeleteCustomer}
+                findHighestId={mockFindHighestId}
+            />
         );
-        
-        // Select a row
-        const firstRow = screen.getByTestId('customer-row-1');
-        fireEvent.click(firstRow);
-        
-        // Test update navigation
-        const updateButton = screen.getByText('Update Customer');
-        fireEvent.click(updateButton);
-        expect(mockNavigate).toHaveBeenCalledWith('/update_customer/1');
-        
-        // Test delete navigation
-        const deleteButton = screen.getByText('Delete Customer');
+
+        expect(screen.getAllByText('Add Customer')).toHaveLength(2);
+        expect(screen.getByTestId('add-customer-form')).toBeInTheDocument();
+    });
+
+    test('shows UpdateCustomer form when customer is selected', () => {
+        render(
+            <DisplayCustomers 
+                customers={mockCustomers}
+                addCustomer={mockAddCustomer}
+                updateCustomer={mockUpdateCustomer}
+                deleteCustomer={mockDeleteCustomer}
+                findHighestId={mockFindHighestId}
+            />
+        );
+
+        // Click on customer row to select it
+        const customerRow = screen.getByTestId('customer-row-1');
+        fireEvent.click(customerRow);
+
+        expect(screen.getAllByText('Update Customer')).toHaveLength(2);
+        expect(screen.getByTestId('update-customer-form')).toBeInTheDocument();
+    });
+
+    test('delete button is disabled when no customer selected', () => {
+        render(
+            <DisplayCustomers 
+                customers={mockCustomers}
+                addCustomer={mockAddCustomer}
+                updateCustomer={mockUpdateCustomer}
+                deleteCustomer={mockDeleteCustomer}
+                findHighestId={mockFindHighestId}
+            />
+        );
+
+        const deleteButton = screen.getByTestId('delete-customer-button');
+        expect(deleteButton).toBeDisabled();
+    });
+
+    test('delete button is enabled when customer is selected', () => {
+        render(
+            <DisplayCustomers 
+                customers={mockCustomers}
+                addCustomer={mockAddCustomer}
+                updateCustomer={mockUpdateCustomer}
+                deleteCustomer={mockDeleteCustomer}
+                findHighestId={mockFindHighestId}
+            />
+        );
+
+        // Select a customer
+        const customerRow = screen.getByTestId('customer-row-1');
+        fireEvent.click(customerRow);
+
+        const deleteButton = screen.getByTestId('delete-customer-button');
+        expect(deleteButton).toBeEnabled();
+    });
+
+    test('calls deleteCustomer when delete button is clicked', () => {
+        render(
+            <DisplayCustomers 
+                customers={mockCustomers}
+                addCustomer={mockAddCustomer}
+                updateCustomer={mockUpdateCustomer}
+                deleteCustomer={mockDeleteCustomer}
+                findHighestId={mockFindHighestId}
+            />
+        );
+
+        // Select a customer
+        const customerRow = screen.getByTestId('customer-row-1');
+        fireEvent.click(customerRow);
+
+        // Click delete button
+        const deleteButton = screen.getByTestId('delete-customer-button');
         fireEvent.click(deleteButton);
-        expect(mockNavigate).toHaveBeenCalledWith('/delete_customer/1');
+
+        expect(mockDeleteCustomer).toHaveBeenCalledWith(1);
     });
 });

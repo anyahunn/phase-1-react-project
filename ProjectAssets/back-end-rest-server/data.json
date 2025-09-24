@@ -17,6 +17,12 @@
       "email": "luke@yahoo.com",
       "password": "test",
       "id": 2
+    },
+    {
+      "name": "Steve Young",
+      "email": "Steve@yahoo.com",
+      "password": "Steve",
+      "id": 3
     }
   ]
 }

@@ -1,76 +1,73 @@
 .container {
-    color:black;
-    max-width: 600px;
-    margin: 40px auto;
-    padding: 24px;
-    background: #f5f8fa; /* Changed to a light blue-gray */
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    
-  }
-  
-  .title {
-    font-size: 2rem;
-    font-weight: 600;
-    margin-bottom: 24px;
-    color: #000000; /* Darker text for contrast */
-  }
-  
-  .delete-customer-details {
-    color: #000000;
-    margin-bottom: 1em;
-    border: 1px solid #eee;
-    padding: 1em;
-    border-radius: 12px;
-    background: #fff; /* White background for details */
-  }
-  
+  color: black;
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 24px;
+  background: #f5f8fa; /* Changed to a light blue-gray */
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
 
-  .form-group {
-    margin-bottom: 18px;
-  }
-  
-  .label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: #000000; /* Blue label for contrast */
-  }
-  
-  .text {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 300;
-    color: #000000; /* Blue label for contrast */
-  }
-  
-  .button-group {
-    display: flex;
-    gap: 0.5em;
-    margin-top: 0.5em;
-  }
-  
-  .button {
-    padding: 10px 20px;
-    background: #1976d2;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: background 0.2s;
-  }
-  
-  .button:hover {
-    background: #1565c0;
-  }
-  
-  .button.cancel {
-    background: #eee;
-    color: #333;
-  }
-  
-  .button.cancel:hover {
-    background: #ccc;
-  }
-  
+.title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #000000;
+}
+
+.delete-customer-details {
+  color: #000000;
+  margin-bottom: 1em;
+  border: 1px solid #eee;
+  padding: 1em;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+
+.label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #000000;
+}
+
+.text {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 300;
+  color: #000000;
+}
+
+.button-group {
+  display: flex;
+  gap: 0.5em;
+  margin-top: 0.5em;
+}
+
+.button {
+  padding: 10px 20px;
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+.button:hover {
+  background: #ffffff;
+}
+
+.button.cancel {
+  background: #eee;
+  color: #333;
+}
+
+.button.cancel:hover {
+  background: #ffffff;
+}

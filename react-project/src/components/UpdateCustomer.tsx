@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import './UpdateCustomer.css';
+import { Box, Paper, Typography, TextField, Button, Stack } from '@mui/material';
 
 interface UpdateCustomerProps {
     customerId?: number;
@@ -51,52 +52,50 @@ function UpdateCustomer({ customerId: propId, onCustomerUpdated, onCancel }: Upd
     };
 
     return (
-        <div className='container'>
-            <h2 data-testid="update-customer-title" className="update-customer-title">Update Customer</h2>
-            <form onSubmit={handleSubmit} data-testid="update-customer-form" className="update-customer-form">
-                <div className="form-group">
-                    <label className="label" htmlFor="name">Name:</label>
-                    <input
-                        data-testid="name-input"
-                        className="input"
-                        type="text"
-                        id="name"
-                        placeholder="Enter your name"
-                        value={customer.name}
-                        onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
-                        required
-                    />
-                </div>
-                <div className="form-group">
-                    <label className="label" htmlFor="email">Email:</label>
-                    <input
-                        data-testid="email-input"
-                        className="input"
-                        type="email"
-                        id="email"
-                        placeholder="Enter your email"
-                        value={customer.email}
-                        onChange={(e) => setCustomer({ ...customer, email: e.target.value })}
-                        required
-                    />
-                </div>
-                <div className="form-group">
-                    <label className="label" htmlFor="password">Password:</label>
-                    <input
-                        data-testid="password-input"
-                        className="input"
-                        type="password"
-                        id="password"
-                        placeholder="Enter your password"
-                        value={customer.password}
-                        onChange={(e) => setCustomer({ ...customer, password: e.target.value })}
-                        required
-                    />
-                </div>
-                <button data-testid="submit-button" className="submit-button" type="submit">Update Customer</button>
-            </form>
-            <button className="button-cancel" onClick={cancel}>Cancel</button>
-        </div>
+        <Box sx={{ maxWidth: 520, mx: 'auto', mt: 6 }}>
+            <Paper sx={{ p: 3 }}>
+                <Typography data-testid="update-customer-title" variant="h5" gutterBottom>
+                    Update Customer
+                </Typography>
+                <Box component="form" onSubmit={handleSubmit} data-testid="update-customer-form">
+                    <Stack spacing={2}>
+                        <TextField
+                            data-testid="name-input"
+                            id="name"
+                            label="Name"
+                            value={customer.name}
+                            onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
+                            required
+                            fullWidth
+                        />
+                        <TextField
+                            data-testid="email-input"
+                            id="email"
+                            type="email"
+                            label="Email"
+                            value={customer.email}
+                            onChange={(e) => setCustomer({ ...customer, email: e.target.value })}
+                            required
+                            fullWidth
+                        />
+                        <TextField
+                            data-testid="password-input"
+                            id="password"
+                            type="password"
+                            label="Password"
+                            value={customer.password}
+                            onChange={(e) => setCustomer({ ...customer, password: e.target.value })}
+                            required
+                            fullWidth
+                        />
+                        <Stack direction="row" spacing={2} justifyContent="flex-end">
+                            <Button onClick={cancel} variant="outlined">Cancel</Button>
+                            <Button data-testid="submit-button" type="submit" variant="contained">Update Customer</Button>
+                        </Stack>
+                    </Stack>
+                </Box>
+            </Paper>
+        </Box>
     );
 }
 

@@ -89,10 +89,6 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
         testId="customer-search-bar"
       />
 
-      <Typography variant="body2" sx={{ mt: 1, mb: 2 }}>
-        Showing {filteredCustomers.length} of {customers.length} customers
-      </Typography>
-
       <TableContainer component={Paper}>
         <Table data-testid="customer-table">
           <TableHead>
@@ -129,21 +125,25 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
       {filteredCustomers.length === 0 && customers.length > 0 && (
         <Typography sx={{ mt: 2 }}>No customers found matching your search criteria.</Typography>
       )}
-
-      <Button
-        variant="contained"
-        color="error"
-        data-testid="delete-customer-btn"
-        onClick={() => {
-          if (selectedCustomer != -1) {
-            navigate(`/delete_customer/${selectedCustomer}`);
-          }
-        }}
-        disabled={selectedCustomer == -1}
-        sx={{ mt: 2 }}
-      >
-        {buttonText2}
-      </Button>
+      <Typography variant="body2" sx={{ mt: 1, mb: 2 }}>
+        Showing {filteredCustomers.length} of {customers.length} customers
+      </Typography>
+      {selectedCustomer != -1 && (
+        <Button
+          variant="contained"
+          color="error"
+          data-testid="delete-customer-btn"
+          onClick={() => {
+            if (selectedCustomer != -1) {
+              navigate(`/delete_customer/${selectedCustomer}`);
+            }
+          }}
+          disabled={selectedCustomer == -1}
+          sx={{ mt: 2 }}
+        >
+          {buttonText2}
+        </Button>
+      )}
 
       <Box sx={{ mt: 3 }}>
         {selectedCustomer != -1 ? (

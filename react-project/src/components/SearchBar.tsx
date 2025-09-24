@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./SearchBar.css";
+import { TextField, IconButton, InputAdornment, Paper, Typography } from "@mui/material";
 
 interface SearchBarProps {
   onSearch: (searchTerm: string) => void;
@@ -26,28 +27,30 @@ const SearchBar: React.FC<SearchBarProps> = ({
   };
 
   return (
-    <div className="search-container" data-testid={testId}>
-      <div className="search-input-wrapper">
-        <input
-          type="text"
-          value={searchTerm}
-          onChange={handleSearchChange}
-          placeholder={placeholder}
-          className="search-input"
-          data-testid="search-input"
-        />
-
-        {searchTerm && (
-          <button
-            onClick={clearSearch}
-            className="clear-button"
-            title="Clear search"
-            data-testid="clear-search-btn"
-            type="button"
-          ></button>
-        )}
-      </div>
-    </div>
+    <Paper elevation={0} data-testid={testId} sx={{ mb: 2 }}>
+      <TextField
+        fullWidth
+        value={searchTerm}
+        onChange={handleSearchChange}
+        placeholder={placeholder}
+        data-testid="search-input"
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              {searchTerm && (
+                <IconButton
+                  aria-label="clear search"
+                  onClick={clearSearch}
+                  data-testid="clear-search-btn"
+                >
+                  <Typography>Clear</Typography>
+                </IconButton>
+              )}
+            </InputAdornment>
+          ),
+        }}
+      />
+    </Paper>
   );
 };
 

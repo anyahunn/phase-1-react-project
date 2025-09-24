@@ -13,7 +13,7 @@
 
   --primary-blue: #4a90e2;
   --primary-blue-hover: #357ab7;
-  --light-blue-bg: #f5f9ff;
+  --light-blue-bg: #ffffff;
   --border-blue: #c9ddf2;
 }
 
@@ -23,7 +23,7 @@ a {
   text-decoration: none;
 }
 a:hover {
-  color: var(--primary-blue-hover);
+  color: #fdfdfd;
 }
 
 body {
@@ -57,7 +57,7 @@ button {
   transition: background-color 0.25s, border-color 0.25s;
 }
 button:hover {
-  background-color: var(--primary-blue-hover);
+  border-color: var(--primary-blue-hover);
 }
 button:focus,
 button:focus-visible {

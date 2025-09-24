@@ -1,11 +1,11 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useState } from 'react';
-import './App.css';
-import { Container, CssBaseline } from '@mui/material';
-import DisplayCustomers from './components/DisplayCustomers';
-import AddCustomer from './components/AddCustomer';
-import DeleteCustomer from './components/DeleteCustomer';
-import UpdateCustomer from './components/UpdateCustomer';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useState } from "react";
+import "./App.css";
+import { Container, CssBaseline } from "@mui/material";
+import DisplayCustomers from "./components/DisplayCustomers";
+import AddCustomer from "./components/AddCustomer";
+import DeleteCustomer from "./components/DeleteCustomer";
+import UpdateCustomer from "./components/UpdateCustomer";
 
 // Extract the routes component for testing
 export const AppRoutes = () => (
@@ -20,7 +20,6 @@ export const AppRoutes = () => (
 );
 
 function App() {
-
   return (
     <Router>
       <CssBaseline />
@@ -29,4 +28,4 @@ function App() {
   );
 }
 
-export default App
+export default App;

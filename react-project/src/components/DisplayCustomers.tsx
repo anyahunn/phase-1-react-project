@@ -105,7 +105,14 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
                   selected={isSelected}
                   data-testid={`customer-row-${customer.id}`}
                   onClick={() => setSelectedCustomer(isSelected ? -1 : customer.id)}
-                  sx={{ cursor: "pointer" }}
+                  sx={{
+                    cursor: "pointer",
+                    ...(isSelected && {
+                      "& td": {
+                        fontWeight: "bold",
+                      },
+                    }),
+                  }}
                 >
                   <TableCell>{customer.id}</TableCell>
                   <TableCell>{customer.name}</TableCell>

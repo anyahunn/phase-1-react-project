@@ -1,18 +1,6 @@
 {
   "customers": [
     {
-      "id": 1,
-      "name": "Karen Addams 123",
-      "email": "karena@abc.com",
-      "password": "karena"
-    },
-    {
-      "name": "Luke Chester",
-      "email": "luke@yahoo.com",
-      "password": "test",
-      "id": 2
-    },
-    {
       "id": 3,
       "name": "Steve Younghhjjhjhasds",
       "email": "Steve@yahoo.com",
@@ -47,6 +35,12 @@
       "email": "anya@test.com",
       "password": "ahsdhash",
       "id": 9
+    },
+    {
+      "name": "anya",
+      "email": "anya@gmail.com",
+      "password": "anya",
+      "id": 10
     }
   ]
 }

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import AddCustomer from "./AddCustomer";
 import UpdateCustomer from "./UpdateCustomer";
 import SearchBar from "./SearchBar";
 import {
@@ -29,6 +28,8 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
   const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<number | -1>(-1);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [updateModalOpen, setUpdateModalOpen] = useState<boolean>(false);
+  const [showPasswords, setShowPasswords] = useState<{ [key: number]: boolean }>({});
   const buttonText2 = "Delete Customer";
 
   useEffect(() => {
@@ -61,6 +62,21 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
   const refreshCustomers = () => {
     fetchCustomers();
     setSelectedCustomer(-1);
+    setUpdateModalOpen(false);
+  };
+
+  const togglePasswordVisibility = (customerId: number) => {
+    setShowPasswords((prev) => ({
+      ...prev,
+      [customerId]: !prev[customerId],
+    }));
+  };
+
+  const renderPassword = (customer: Customer) => {
+    if (showPasswords[customer.id]) {
+      return customer.password;
+    }
+    return "*".repeat(8);
   };
 
   const handleSearch = (searchTerm: string) => {
@@ -85,6 +101,19 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
     if (selectedCustomer !== -1 && !filtered.some((customer) => customer.id === selectedCustomer)) {
       setSelectedCustomer(-1);
     }
+  };
+
+  const handleRowClick = (customerId: number) => {
+    const isSelected = selectedCustomer === customerId;
+    setSelectedCustomer(isSelected ? -1 : customerId);
+    if (!isSelected) {
+      setUpdateModalOpen(true);
+    }
+  };
+
+  const handleUpdateCancel = () => {
+    setUpdateModalOpen(false);
+    setSelectedCustomer(-1);
   };
 
   return (
@@ -130,69 +159,67 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
               <TableBody>
                 {filteredCustomers.map((customer) => {
                   const isSelected = selectedCustomer === customer.id;
-              return (
-                <TableRow
-                  key={customer.id}
-                  hover
-                  selected={isSelected}
-                  data-testid={`customer-row-${customer.id}`}
-                  onClick={() => setSelectedCustomer(isSelected ? -1 : customer.id)}
-                  sx={{
-                    cursor: "pointer",
-                    ...(isSelected && {
-                      "& td": {
-                        fontWeight: "bold",
-                      },
-                    }),
-                  }}
-                >
-                  <TableCell>{customer.id}</TableCell>
-                  <TableCell>{customer.name}</TableCell>
-                  <TableCell>{customer.email}</TableCell>
-                  <TableCell>{customer.password}</TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                  const isPasswordVisible = showPasswords[customer.id];
 
-      {filteredCustomers.length === 0 && customers.length > 0 && (
-        <Typography sx={{ mt: 2 }}>No customers found matching your search criteria.</Typography>
-      )}
-      <Typography variant="body2" sx={{ mt: 1, mb: 2 }}>
-        Showing {filteredCustomers.length} of {customers.length} customers
-      </Typography>
-      {selectedCustomer != -1 && (
-        <Button
-          variant="contained"
-          color="error"
-          data-testid="delete-customer-btn"
-          onClick={() => {
-            if (selectedCustomer != -1) {
-              navigate(`/delete_customer/${selectedCustomer}`);
-            }
-          }}
-          disabled={selectedCustomer == -1}
-          sx={{ mt: 2 }}
-        >
-          {buttonText2}
-        </Button>
-      )}
+                  return (
+                    <TableRow
+                      key={customer.id}
+                      hover
+                      selected={isSelected}
+                      data-testid={`customer-row-${customer.id}`}
+                      onClick={() => handleRowClick(customer.id)}
+                      sx={{
+                        cursor: "pointer",
+                        ...(isSelected && {
+                          "& td": {
+                            fontWeight: "bold",
+                          },
+                        }),
+                      }}
+                    >
+                      <TableCell>{customer.id}</TableCell>
+                      <TableCell>{customer.name}</TableCell>
+                      <TableCell>{customer.email}</TableCell>
+                      <TableCell>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          <span>{renderPassword(customer)}</span>
+
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              togglePasswordVisibility(customer.id);
+                            }}
+                          >
+                            {isPasswordVisible ? "Hide" : "Show"}
+                          </Button>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          {filteredCustomers.length === 0 && customers.length > 0 && (
+            <Typography sx={{ mt: 2 }}>
+              No customers found matching your search criteria.
+            </Typography>
+          )}
+          <Typography variant="body2" sx={{ mt: 1, mb: 2 }}>
+            Showing {filteredCustomers.length} of {customers.length} customers
+          </Typography>
         </>
       )}
 
-      <Box sx={{ mt: 3 }}>
-        {selectedCustomer != -1 ? (
-          <UpdateCustomer
-            customerId={selectedCustomer}
-            onCustomerUpdated={refreshCustomers}
-            onCancel={() => setSelectedCustomer(-1)}
-          />
-        ) : (
-          <AddCustomer onCustomerAdded={refreshCustomers} onCancel={() => {}} />
-        )}
-      </Box>
+      <UpdateCustomer
+        customerId={selectedCustomer}
+        onCustomerUpdated={refreshCustomers}
+        onCancel={handleUpdateCancel}
+        open={updateModalOpen}
+      />
     </Box>
   );
 };

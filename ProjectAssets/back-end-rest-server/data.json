@@ -13,10 +13,10 @@
       "id": 2
     },
     {
-      "name": "Steve Young",
+      "id": 3,
+      "name": "Steve Younghhjjhjhasds",
       "email": "Steve@yahoo.com",
-      "password": "Steve",
-      "id": 3
+      "password": "Steve"
     },
     {
       "name": "John Lennon",
@@ -41,6 +41,12 @@
       "email": "annie@yahoo.com",
       "password": "12345",
       "id": 7
+    },
+    {
+      "name": "Anya",
+      "email": "anya@test.com",
+      "password": "ahsdhash",
+      "id": 8
     }
   ]
 }

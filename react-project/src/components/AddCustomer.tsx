@@ -13,6 +13,7 @@ function AddCustomer({ onCustomerAdded, onCancel }: AddCustomerProps = {}) {
   const navigate = useNavigate();
 
   const cancel = () => {
+
     setCustomer({ name: "", email: "", password: "" });
   };
 
@@ -35,7 +36,7 @@ function AddCustomer({ onCustomerAdded, onCancel }: AddCustomerProps = {}) {
   };
 
   return (
-    <Box sx={{ maxWidth: 480, mx: "auto", mt: 6 }}>
+    <Box sx={{ maxWidth: 480, mx: "auto", mt: 6, boxShadow: 3 }}>
       <Paper sx={{ p: 3 }}>
         <Typography data-testid="add-customer-title" variant="h5" gutterBottom>
           Add Customer

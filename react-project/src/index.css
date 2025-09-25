@@ -23,7 +23,7 @@ a {
   text-decoration: none;
 }
 a:hover {
-  color: #fdfdfd;
+  color: #000000;
 }
 
 body {
@@ -52,7 +52,7 @@ button {
   font-weight: 500;
   font-family: inherit;
   background-color: var(--primary-blue);
-  color: #ffffff;
+  color: #000000;
   cursor: pointer;
   transition: background-color 0.25s, border-color 0.25s;
 }
@@ -82,5 +82,5 @@ td {
   border-bottom: 1px solid var(--border-blue);
 }
 tr:hover {
-  background-color: #eef6ff;
+  background-color: #000000;
 }

@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useState } from "react";
 import "./App.css";
-import { AppBar, Container, CssBaseline, Toolbar, Typography } from "@mui/material";
+import { AppBar, Button, Container, CssBaseline, Toolbar, Typography } from "@mui/material";
 import DisplayCustomers from "./components/DisplayCustomers";
 import AddCustomer from "./components/AddCustomer";
 import DeleteCustomer from "./components/DeleteCustomer";
@@ -20,6 +20,12 @@ export const AppRoutes = () => (
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           Customer Manager
         </Typography>
+        <Button variant="text" sx={{ mr: 2, color: "black" }} href="/">
+          Update Customer
+        </Button>
+        <Button variant="text" sx={{ mr: 2, color: "black" }} href="/addCustomer">
+          Add Customer
+        </Button>
       </Toolbar>
     </AppBar>
     <Toolbar />
@@ -29,6 +35,7 @@ export const AppRoutes = () => (
         <Route path="/add_customer/:id" element={<AddCustomer />} />
         <Route path="/delete_customer/:id" element={<DeleteCustomer />} />
         <Route path="/update_customer/:id" element={<UpdateCustomer />} />
+        <Route path="/addCustomer" element={<AddCustomer />} />
       </Routes>
     </Container>
   </>

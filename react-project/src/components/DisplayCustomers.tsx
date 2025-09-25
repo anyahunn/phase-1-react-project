@@ -130,55 +130,57 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
               <TableBody>
                 {filteredCustomers.map((customer) => {
                   const isSelected = selectedCustomer === customer.id;
-              return (
-                <TableRow
-                  key={customer.id}
-                  hover
-                  selected={isSelected}
-                  data-testid={`customer-row-${customer.id}`}
-                  onClick={() => setSelectedCustomer(isSelected ? -1 : customer.id)}
-                  sx={{
-                    cursor: "pointer",
-                    ...(isSelected && {
-                      "& td": {
-                        fontWeight: "bold",
-                      },
-                    }),
-                  }}
-                >
-                  <TableCell>{customer.id}</TableCell>
-                  <TableCell>{customer.name}</TableCell>
-                  <TableCell>{customer.email}</TableCell>
-                  <TableCell>{customer.password}</TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                  return (
+                    <TableRow
+                      key={customer.id}
+                      hover
+                      selected={isSelected}
+                      data-testid={`customer-row-${customer.id}`}
+                      onClick={() => setSelectedCustomer(isSelected ? -1 : customer.id)}
+                      sx={{
+                        cursor: "pointer",
+                        ...(isSelected && {
+                          "& td": {
+                            fontWeight: "bold",
+                          },
+                        }),
+                      }}
+                    >
+                      <TableCell>{customer.id}</TableCell>
+                      <TableCell>{customer.name}</TableCell>
+                      <TableCell>{customer.email}</TableCell>
+                      <TableCell>{customer.password}</TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-      {filteredCustomers.length === 0 && customers.length > 0 && (
-        <Typography sx={{ mt: 2 }}>No customers found matching your search criteria.</Typography>
-      )}
-      <Typography variant="body2" sx={{ mt: 1, mb: 2 }}>
-        Showing {filteredCustomers.length} of {customers.length} customers
-      </Typography>
-      {selectedCustomer != -1 && (
-        <Button
-          variant="contained"
-          color="error"
-          data-testid="delete-customer-btn"
-          onClick={() => {
-            if (selectedCustomer != -1) {
-              navigate(`/delete_customer/${selectedCustomer}`);
-            }
-          }}
-          disabled={selectedCustomer == -1}
-          sx={{ mt: 2 }}
-        >
-          {buttonText2}
-        </Button>
-      )}
+          {filteredCustomers.length === 0 && customers.length > 0 && (
+            <Typography sx={{ mt: 2 }}>
+              No customers found matching your search criteria.
+            </Typography>
+          )}
+          <Typography variant="body2" sx={{ mt: 1, mb: 2 }}>
+            Showing {filteredCustomers.length} of {customers.length} customers
+          </Typography>
+          {selectedCustomer != -1 && (
+            <Button
+              variant="contained"
+              color="error"
+              data-testid="delete-customer-btn"
+              onClick={() => {
+                if (selectedCustomer != -1) {
+                  navigate(`/delete_customer/${selectedCustomer}`);
+                }
+              }}
+              disabled={selectedCustomer == -1}
+              sx={{ mt: 2 }}
+            >
+              {buttonText2}
+            </Button>
+          )}
         </>
       )}
 
@@ -190,7 +192,7 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
             onCancel={() => setSelectedCustomer(-1)}
           />
         ) : (
-          <AddCustomer onCustomerAdded={refreshCustomers} onCancel={() => {}} />
+          <></>
         )}
       </Box>
     </Box>

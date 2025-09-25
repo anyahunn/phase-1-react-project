@@ -13,6 +13,7 @@ import {
   Box,
   Paper,
   TableContainer,
+  TablePagination,
 } from "@mui/material";
 
 interface Customer {
@@ -30,6 +31,8 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [updateModalOpen, setUpdateModalOpen] = useState<boolean>(false);
   const [showPasswords, setShowPasswords] = useState<{ [key: number]: boolean }>({});
+  const [page, setPage] = useState<number>(0);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const buttonText2 = "Delete Customer";
 
   useEffect(() => {
@@ -82,6 +85,7 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
   const handleSearch = (searchTerm: string) => {
     if (!searchTerm.trim()) {
       setFilteredCustomers(customers);
+      setPage(0);
       return;
     }
 
@@ -96,6 +100,7 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
     });
 
     setFilteredCustomers(filtered);
+    setPage(0);
 
     if (selectedCustomer !== -1 && !filtered.some((customer) => customer.id === selectedCustomer)) {
       setSelectedCustomer(-1);
@@ -114,6 +119,20 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
     setUpdateModalOpen(false);
     setSelectedCustomer(-1);
   };
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const paginatedCustomers = filteredCustomers.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
 
   return (
     <Box>
@@ -145,18 +164,18 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
 
       {customers.length > 0 && (
         <>
-          <TableContainer component={Paper}>
-            <Table data-testid="customer-table">
+          <TableContainer component={Paper} sx={{ minHeight: 400 }}>
+            <Table data-testid="customer-table" size="medium">
               <TableHead>
                 <TableRow>
-                  <TableCell>ID</TableCell>
-                  <TableCell>Name</TableCell>
-                  <TableCell>Email</TableCell>
-                  <TableCell>Password</TableCell>
+                  <TableCell sx={{ width: "10%" }}>ID</TableCell>
+                  <TableCell sx={{ width: "25%" }}>Name</TableCell>
+                  <TableCell sx={{ width: "35%" }}>Email</TableCell>
+                  <TableCell sx={{ width: "30%" }}>Password</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {filteredCustomers.map((customer) => {
+                {paginatedCustomers.map((customer) => {
                   const isSelected = selectedCustomer === customer.id;
                   const isPasswordVisible = showPasswords[customer.id];
 
@@ -169,6 +188,7 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
                       onClick={() => handleRowClick(customer.id)}
                       sx={{
                         cursor: "pointer",
+                        height: 60,
                         ...(isSelected && {
                           "& td": {
                             fontWeight: "bold",
@@ -202,14 +222,21 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
             </Table>
           </TableContainer>
 
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25, 50]}
+            component="div"
+            count={filteredCustomers.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+
           {filteredCustomers.length === 0 && customers.length > 0 && (
             <Typography sx={{ mt: 2 }}>
               No customers found matching your search criteria.
             </Typography>
           )}
-          <Typography variant="body2" sx={{ mt: 1, mb: 2 }}>
-            Showing {filteredCustomers.length} of {customers.length} customers
-          </Typography>
         </>
       )}
       <Box alignContent={"center"} textAlign="center" sx={{ mt: 3 }}>

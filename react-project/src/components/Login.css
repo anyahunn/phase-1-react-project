@@ -1,0 +1,108 @@
+/* Login Component Styles */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--vscode-editor-background, #ffffff);
+  color: var(--vscode-editor-foreground, #000000);
+}
+
+.login-paper {
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  background: var(--vscode-sideBar-background, #ffffff);
+  border: 1px solid var(--vscode-panel-border, #e0e0e0);
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.login-title {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: var(--vscode-editor-foreground, #000000);
+}
+
+.login-subtitle {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--vscode-descriptionForeground, #666666);
+  font-size: 0.875rem;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.login-input {
+  width: 100%;
+}
+
+.login-button {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--vscode-button-background, #0066cc);
+  color: var(--vscode-button-foreground, #ffffff);
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.login-button:hover:not(:disabled) {
+  background-color: var(--vscode-button-hoverBackground, #005bb5);
+}
+
+.login-button:disabled {
+  background-color: var(--vscode-button-secondaryBackground, #cccccc);
+  cursor: not-allowed;
+}
+
+.login-error {
+  background-color: var(--vscode-inputValidation-errorBackground, #fee);
+  color: var(--vscode-inputValidation-errorForeground, #c00);
+  border: 1px solid var(--vscode-inputValidation-errorBorder, #f88);
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.login-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  color: var(--vscode-descriptionForeground, #666666);
+  font-size: 0.875rem;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 0.5rem;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .login-container {
+    background: var(--vscode-editor-background, #1e1e1e);
+    color: var(--vscode-editor-foreground, #ffffff);
+  }
+
+  .login-paper {
+    background: var(--vscode-sideBar-background, #252526);
+    border-color: var(--vscode-panel-border, #3c3c3c);
+  }
+}

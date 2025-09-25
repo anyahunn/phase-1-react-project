@@ -16,13 +16,13 @@ export const AppRoutes = () => (
       sx={{ bgcolor: "background.paper", color: "text.primary" }}
     >
       <Toolbar>
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
+        <Typography variant="h6" sx={{ flexGrow: 1, alignContent: "center" }}>
           Customer Manager
         </Typography>
-        <Button component={Link} to="/" variant="text" sx={{ mr: 2, color: "black" }}>
+        <Button component={Link} to="/" variant="text" sx={{ color: "black" }}>
           Customer List
         </Button>
-        <Button component={Link} to="/addCustomer" variant="text" sx={{ mr: 2, color: "black" }}>
+        <Button component={Link} to="/addCustomer" variant="text" sx={{ color: "black" }}>
           Add Customer
         </Button>
       </Toolbar>

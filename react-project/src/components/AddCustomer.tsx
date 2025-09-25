@@ -82,7 +82,7 @@ function AddCustomer({ onCustomerAdded, onCancel }: AddCustomerProps = {}) {
                 </div>
                 <button data-testid="add-customer-submit" className="button" type="submit">Add Customer</button>
             </form>
-            <button className="button cancel" onClick={cancel}>Cancel</button>
+            <button className="cancel-button" onClick={cancel}>Cancel</button>
         </div>
     );
 }

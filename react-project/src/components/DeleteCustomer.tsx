@@ -32,24 +32,24 @@ function DeleteCustomer() {
   }
 
   return (
-    <Paper sx={{ p: 4, maxWidth: 600, mx: "auto", mt: 6 }}>
-      <Typography variant="h5" gutterBottom>
+    <Paper sx={{ p: 4, maxWidth: 1000, mx: "auto", mt: 6, elevation: 3, boxShadow: 3, rounded: 4 }}>
+      <Typography variant="h2" gutterBottom>
         Delete Customer
       </Typography>
       <Box sx={{ mb: 2 }}>
         <Stack spacing={1}>
-          <Typography>
+          <Typography variant="h5" gutterBottom>
             <strong>Name:</strong> {customer.name}
           </Typography>
-          <Typography>
+          <Typography variant="h5" gutterBottom>
             <strong>Email:</strong> {customer.email}
           </Typography>
-          <Typography>
+          <Typography variant="h5" gutterBottom>
             <strong>Password:</strong> {customer.password}
           </Typography>
         </Stack>
       </Box>
-      <Stack direction="row" spacing={2} justifyContent="flex-end">
+      <Stack direction="row" spacing={2} justifyContent="center">
         <Button variant="contained" color="error" onClick={handleDelete}>
           Confirm Delete
         </Button>

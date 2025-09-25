@@ -212,13 +212,14 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
           </Typography>
         </>
       )}
-
-      <UpdateCustomer
-        customerId={selectedCustomer}
-        onCustomerUpdated={refreshCustomers}
-        onCancel={handleUpdateCancel}
-        open={updateModalOpen}
-      />
+      <Box alignContent={"center"} textAlign="center" sx={{ mt: 3 }}>
+        <UpdateCustomer
+          customerId={selectedCustomer}
+          onCustomerUpdated={refreshCustomers}
+          onCancel={handleUpdateCancel}
+          open={updateModalOpen}
+        />
+      </Box>
     </Box>
   );
 };

@@ -61,7 +61,11 @@ function UpdateCustomer(
   };
 
   return (
-    <Modal open={open} onClose={cancel}>
+    <Modal
+      open={open}
+      onClose={cancel}
+      sx={{ display: "flex", alignItems: "center", justifyContent: "center", shadow: 24 }}
+    >
       <Box sx={{ maxWidth: 520, mx: "auto", mt: 6 }}>
         <Paper sx={{ p: 3 }}>
           <Typography data-testid="update-customer-title" variant="h5" gutterBottom>

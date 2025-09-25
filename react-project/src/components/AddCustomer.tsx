@@ -13,7 +13,6 @@ function AddCustomer({ onCustomerAdded, onCancel }: AddCustomerProps = {}) {
   const navigate = useNavigate();
 
   const cancel = () => {
-
     setCustomer({ name: "", email: "", password: "" });
   };
 

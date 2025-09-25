@@ -33,8 +33,7 @@ export const AppRoutes = () => (
         <Route path="/" element={<DisplayCustomers />} />
         <Route path="/addCustomer" element={<AddCustomer />} />
         <Route path="/updateCustomer/:id" element={<UpdateCustomer open={false} />} />
-        <Route path="/deleteCustomer/:id" element={<DeleteCustomer />} />
-        <Route path="*" element={<div>404 - Page Not Found</div>} />
+        <Route path="/delete_Customer/:id" element={<DeleteCustomer />} />
       </Routes>
     </Container>
   </>

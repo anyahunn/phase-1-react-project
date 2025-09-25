@@ -13,7 +13,6 @@ import {
   Box,
   Paper,
   TableContainer,
-  IconButton,
 } from "@mui/material";
 
 interface Customer {

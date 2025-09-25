@@ -77,7 +77,7 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
     if (showPasswords[customer.id]) {
       return customer.password;
     }
-    return "*".repeat(8); // Show 8 asterisks regardless of actual password length
+    return "*".repeat(8);
   };
 
   const handleSearch = (searchTerm: string) => {

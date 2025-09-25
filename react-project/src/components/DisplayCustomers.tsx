@@ -28,6 +28,7 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<number | -1>(-1);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const buttonText2 = "Delete Customer";
 
   useEffect(() => {
@@ -35,13 +36,26 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
   }, []);
 
   const fetchCustomers = () => {
+    setIsLoading(true);
     fetch("http://localhost:4000/customers")
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(`Failed to fetch customers: ${res.status} ${res.statusText}`);
+        }
+        return res.json();
+      })
       .then((data) => {
         setCustomers(data);
         setFilteredCustomers(data);
+        setIsLoading(false);
       })
-      .catch((err) => console.error("Failed to fetch customers:", err));
+      .catch((err) => {
+        console.error("Failed to fetch customers:", err);
+        alert("Unable to load customers. Please check your connection and try again.");
+        setCustomers([]);
+        setFilteredCustomers([]);
+        setIsLoading(false);
+      });
   };
 
   const refreshCustomers = () => {
@@ -85,19 +99,37 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
         testId="customer-search-bar"
       />
 
-      <TableContainer component={Paper}>
-        <Table data-testid="customer-table">
-          <TableHead>
-            <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Password</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredCustomers.map((customer) => {
-              const isSelected = selectedCustomer === customer.id;
+      {isLoading && (
+        <Box sx={{ mt: 2, mb: 2 }}>
+          <Typography variant="body1" color="text.secondary" data-testid="loading-message">
+            Loading customers...
+          </Typography>
+        </Box>
+      )}
+
+      {customers.length === 0 && !isLoading && (
+        <Box sx={{ mt: 2, mb: 2 }}>
+          <Typography variant="body1" color="text.secondary" data-testid="no-customers-message">
+            No customers found in the database. Add your first customer using the form below.
+          </Typography>
+        </Box>
+      )}
+
+      {customers.length > 0 && (
+        <>
+          <TableContainer component={Paper}>
+            <Table data-testid="customer-table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>ID</TableCell>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Email</TableCell>
+                  <TableCell>Password</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredCustomers.map((customer) => {
+                  const isSelected = selectedCustomer === customer.id;
               return (
                 <TableRow
                   key={customer.id}
@@ -105,7 +137,14 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
                   selected={isSelected}
                   data-testid={`customer-row-${customer.id}`}
                   onClick={() => setSelectedCustomer(isSelected ? -1 : customer.id)}
-                  sx={{ cursor: "pointer" }}
+                  sx={{
+                    cursor: "pointer",
+                    ...(isSelected && {
+                      "& td": {
+                        fontWeight: "bold",
+                      },
+                    }),
+                  }}
                 >
                   <TableCell>{customer.id}</TableCell>
                   <TableCell>{customer.name}</TableCell>
@@ -139,6 +178,8 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
         >
           {buttonText2}
         </Button>
+      )}
+        </>
       )}
 
       <Box sx={{ mt: 3 }}>

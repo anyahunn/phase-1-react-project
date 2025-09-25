@@ -52,7 +52,7 @@ button {
   font-weight: 500;
   font-family: inherit;
   background-color: var(--primary-blue);
-  color: #000000;
+  color: #ffffff;
   cursor: pointer;
   transition: background-color 0.25s, border-color 0.25s;
 }
@@ -82,5 +82,5 @@ td {
   border-bottom: 1px solid var(--border-blue);
 }
 tr:hover {
-  background-color: #000000;
+  background-color: #dee8f4;
 }

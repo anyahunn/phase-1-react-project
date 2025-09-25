@@ -91,8 +91,7 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
       return (
         customer.id.toString().includes(searchLower) ||
         customer.name.toLowerCase().includes(searchLower) ||
-        customer.email.toLowerCase().includes(searchLower) ||
-        customer.password.toLowerCase().includes(searchLower)
+        customer.email.toLowerCase().includes(searchLower)
       );
     });
 

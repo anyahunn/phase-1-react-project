@@ -29,6 +29,7 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
   const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<number | -1>(-1);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [updateModalOpen, setUpdateModalOpen] = useState<boolean>(false);
   const buttonText2 = "Delete Customer";
 
   useEffect(() => {
@@ -61,6 +62,7 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
   const refreshCustomers = () => {
     fetchCustomers();
     setSelectedCustomer(-1);
+    setUpdateModalOpen(false);
   };
 
   const handleSearch = (searchTerm: string) => {
@@ -85,6 +87,19 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
     if (selectedCustomer !== -1 && !filtered.some((customer) => customer.id === selectedCustomer)) {
       setSelectedCustomer(-1);
     }
+  };
+
+  const handleRowClick = (customerId: number) => {
+    const isSelected = selectedCustomer === customerId;
+    setSelectedCustomer(isSelected ? -1 : customerId);
+    if (!isSelected) {
+      setUpdateModalOpen(true);
+    }
+  };
+
+  const handleUpdateCancel = () => {
+    setUpdateModalOpen(false);
+    setSelectedCustomer(-1);
   };
 
   return (
@@ -136,7 +151,7 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
                       hover
                       selected={isSelected}
                       data-testid={`customer-row-${customer.id}`}
-                      onClick={() => setSelectedCustomer(isSelected ? -1 : customer.id)}
+                      onClick={() => handleRowClick(customer.id)}
                       sx={{
                         cursor: "pointer",
                         ...(isSelected && {
@@ -184,17 +199,12 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
         </>
       )}
 
-      <Box sx={{ mt: 3 }}>
-        {selectedCustomer != -1 ? (
-          <UpdateCustomer
-            customerId={selectedCustomer}
-            onCustomerUpdated={refreshCustomers}
-            onCancel={() => setSelectedCustomer(-1)}
-          />
-        ) : (
-          <></>
-        )}
-      </Box>
+      <UpdateCustomer
+        customerId={selectedCustomer}
+        onCustomerUpdated={refreshCustomers}
+        onCancel={handleUpdateCancel}
+        open={updateModalOpen}
+      />
     </Box>
   );
 };

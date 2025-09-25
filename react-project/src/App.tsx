@@ -1,5 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import "./App.css";
 import { AppBar, Button, Container, CssBaseline, Toolbar, Typography } from "@mui/material";
 import DisplayCustomers from "./components/DisplayCustomers";
@@ -20,10 +19,10 @@ export const AppRoutes = () => (
         <Typography variant="h6" sx={{ flexGrow: 1 }}>
           Customer Manager
         </Typography>
-        <Button variant="text" sx={{ mr: 2, color: "black" }} href="/">
-          Update Customer
+        <Button component={Link} to="/" variant="text" sx={{ mr: 2, color: "black" }}>
+          Customer List
         </Button>
-        <Button variant="text" sx={{ mr: 2, color: "black" }} href="/addCustomer">
+        <Button component={Link} to="/addCustomer" variant="text" sx={{ mr: 2, color: "black" }}>
           Add Customer
         </Button>
       </Toolbar>
@@ -34,7 +33,7 @@ export const AppRoutes = () => (
         <Route path="/" element={<DisplayCustomers />} />
         <Route path="/add_customer/:id" element={<AddCustomer />} />
         <Route path="/delete_customer/:id" element={<DeleteCustomer />} />
-        <Route path="/update_customer/:id" element={<UpdateCustomer />} />
+        <Route path="/update_customer/:id" element={<UpdateCustomer open={false} />} />
         <Route path="/addCustomer" element={<AddCustomer />} />
       </Routes>
     </Container>

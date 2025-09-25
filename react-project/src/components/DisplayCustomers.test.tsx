@@ -13,6 +13,7 @@ beforeEach(() => {
   mockNavigate.mockClear();
   global.fetch = vi.fn(() =>
     Promise.resolve({
+      ok: true,
       json: () =>
         Promise.resolve([
           { id: 1, name: "John Doe", email: "john@example.com", password: "password123" },
@@ -32,6 +33,11 @@ test("renders customer list from backend", async () => {
       <DisplayCustomers />
     </MemoryRouter>
   );
+
+  await waitFor(() => {
+    expect(global.fetch).toHaveBeenCalledWith("http://localhost:4000/customers");
+  });
+
   expect(await screen.findByText("John Doe")).toBeInTheDocument();
   expect(await screen.findByText("Jane Smith")).toBeInTheDocument();
 });
@@ -53,7 +59,7 @@ test("selects and deselects a customer row", async () => {
   expect(firstRow).not.toHaveClass("Mui-selected");
 });
 
-test("shows delete button when customer is selected", async () => {
+test("opens update modal when customer row is clicked", async () => {
   render(
     <MemoryRouter>
       <DisplayCustomers />
@@ -65,37 +71,7 @@ test("shows delete button when customer is selected", async () => {
   const firstRow = screen.getByTestId("customer-row-1");
   fireEvent.click(firstRow);
 
-  const deleteButton = await screen.findByTestId("delete-customer-btn");
-  expect(deleteButton).toBeInTheDocument();
-});
-
-test("navigates to delete customer page when Delete Customer button is clicked", async () => {
-  render(
-    <MemoryRouter>
-      <DisplayCustomers />
-    </MemoryRouter>
-  );
-
-  await screen.findByText("John Doe");
-
-  const firstRow = screen.getByTestId("customer-row-1");
-  fireEvent.click(firstRow);
-
-  const deleteButton = await screen.findByTestId("delete-customer-btn");
-  fireEvent.click(deleteButton);
-  expect(mockNavigate).toHaveBeenCalledWith("/delete_customer/1");
-});
-
-test("delete button is disabled when no customer is selected", async () => {
-  render(
-    <MemoryRouter>
-      <DisplayCustomers />
-    </MemoryRouter>
-  );
-
-  await screen.findByText("John Doe");
-
-  expect(screen.queryByTestId("delete-customer-btn")).not.toBeInTheDocument();
+  expect(await screen.findByTestId("delete-customer-btn")).toBeInTheDocument();
 });
 
 test("search functionality filters customers", async () => {
@@ -114,4 +90,21 @@ test("search functionality filters customers", async () => {
     expect(screen.queryByText("John Doe")).not.toBeInTheDocument();
   });
   expect(screen.getByText("Jane Smith")).toBeInTheDocument();
+});
+
+test("shows no customers message when no data", async () => {
+  global.fetch = vi.fn(() =>
+    Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve([]),
+    })
+  );
+
+  render(
+    <MemoryRouter>
+      <DisplayCustomers />
+    </MemoryRouter>
+  );
+
+  expect(await screen.findByTestId("no-customers-message")).toBeInTheDocument();
 });

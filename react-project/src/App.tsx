@@ -31,10 +31,10 @@ export const AppRoutes = () => (
     <Container maxWidth="md" className="App" sx={{ py: 4 }}>
       <Routes>
         <Route path="/" element={<DisplayCustomers />} />
-        <Route path="/add_customer/:id" element={<AddCustomer />} />
-        <Route path="/delete_customer/:id" element={<DeleteCustomer />} />
-        <Route path="/update_customer/:id" element={<UpdateCustomer open={false} />} />
         <Route path="/addCustomer" element={<AddCustomer />} />
+        <Route path="/updateCustomer/:id" element={<UpdateCustomer open={false} />} />
+        <Route path="/deleteCustomer/:id" element={<DeleteCustomer />} />
+        <Route path="*" element={<div>404 - Page Not Found</div>} />
       </Routes>
     </Container>
   </>

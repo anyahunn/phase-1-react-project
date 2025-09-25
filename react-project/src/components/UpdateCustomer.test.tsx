@@ -8,7 +8,7 @@ vi.mock("react-router-dom", async () => {
     useParams: () => ({ id: "1" }),
   };
 });
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import UpdateCustomer from "./UpdateCustomer";
 import { MemoryRouter } from "react-router-dom";
@@ -17,6 +17,7 @@ beforeEach(() => {
   mockNavigate.mockClear();
   global.fetch = vi.fn(() =>
     Promise.resolve({
+      ok: true,
       json: () =>
         Promise.resolve({
           id: 1,
@@ -34,10 +35,15 @@ afterEach(() => {
 
 test("renders customer details from backend", async () => {
   render(
-    <MemoryRouter initialEntries={["/update_customer/1"]}>
-      <UpdateCustomer />
+    <MemoryRouter>
+      <UpdateCustomer open={true} customerId={1} />
     </MemoryRouter>
   );
+
+  await waitFor(() => {
+    expect(global.fetch).toHaveBeenCalledWith("http://localhost:4000/customers/1");
+  });
+
   expect(await screen.findByDisplayValue("John Doe")).toBeInTheDocument();
   expect(await screen.findByDisplayValue("john@example.com")).toBeInTheDocument();
   expect(await screen.findByDisplayValue("password123")).toBeInTheDocument();
@@ -45,29 +51,34 @@ test("renders customer details from backend", async () => {
 
 test("navigates back on cancel", async () => {
   render(
-    <MemoryRouter initialEntries={["/update_customer/1"]}>
-      <UpdateCustomer />
+    <MemoryRouter>
+      <UpdateCustomer open={true} customerId={1} />
     </MemoryRouter>
   );
 
-  fireEvent.click(screen.getByRole("button", { name: /Cancel/i }));
+  await screen.findByDisplayValue("John Doe");
+
+  fireEvent.click(screen.getByText("Cancel"));
   expect(mockNavigate).toHaveBeenCalledWith("/");
 });
 
 test("submits updated customer data", async () => {
   render(
-    <MemoryRouter initialEntries={["/update_customer/1"]}>
-      <UpdateCustomer />
+    <MemoryRouter>
+      <UpdateCustomer open={true} customerId={1} />
     </MemoryRouter>
   );
-  const nameInput = await screen.findByDisplayValue("John Doe");
+
+  await screen.findByDisplayValue("John Doe");
+
+  const nameInput = screen.getByDisplayValue("John Doe");
   fireEvent.change(nameInput, { target: { value: "Jane Doe" } });
-  const emailInput = await screen.findByDisplayValue("john@example.com");
+  const emailInput = screen.getByDisplayValue("john@example.com");
   fireEvent.change(emailInput, { target: { value: "jane@example.com" } });
-  const passwordInput = await screen.findByDisplayValue("password123");
+  const passwordInput = screen.getByDisplayValue("password123");
   fireEvent.change(passwordInput, { target: { value: "newpassword" } });
 
-  fireEvent.click(screen.getByRole("button", { name: /update customer/i }));
+  fireEvent.click(screen.getByTestId("submit-button"));
 
   expect(global.fetch).toHaveBeenCalledWith(
     "http://localhost:4000/customers/1",
@@ -82,4 +93,32 @@ test("submits updated customer data", async () => {
       }),
     })
   );
+});
+
+test("navigates to delete page when delete button is clicked", async () => {
+  render(
+    <MemoryRouter>
+      <UpdateCustomer open={true} customerId={1} />
+    </MemoryRouter>
+  );
+
+  await screen.findByDisplayValue("John Doe");
+
+  const deleteButton = screen.getByTestId("delete-customer-btn");
+  fireEvent.click(deleteButton);
+  expect(mockNavigate).toHaveBeenCalledWith("/delete_customer/1");
+});
+
+test("calls onCancel when provided", async () => {
+  const mockOnCancel = vi.fn();
+  render(
+    <MemoryRouter>
+      <UpdateCustomer open={true} customerId={1} onCancel={mockOnCancel} />
+    </MemoryRouter>
+  );
+
+  await screen.findByDisplayValue("John Doe");
+
+  fireEvent.click(screen.getByText("Cancel"));
+  expect(mockOnCancel).toHaveBeenCalled();
 });

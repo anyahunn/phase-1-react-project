@@ -13,11 +13,7 @@ function AddCustomer({ onCustomerAdded, onCancel }: AddCustomerProps = {}) {
   const navigate = useNavigate();
 
   const cancel = () => {
-    if (onCancel) {
-      onCancel();
-    } else {
-      setCustomer({ name: "", email: "", password: "" });
-    }
+    setCustomer({ name: "", email: "", password: "" });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

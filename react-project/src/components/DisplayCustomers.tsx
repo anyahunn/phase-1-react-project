@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import AddCustomer from "./AddCustomer";
 import UpdateCustomer from "./UpdateCustomer";
 import SearchBar from "./SearchBar";
 import {
@@ -14,6 +13,7 @@ import {
   Box,
   Paper,
   TableContainer,
+  IconButton,
 } from "@mui/material";
 
 interface Customer {
@@ -30,6 +30,7 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
   const [selectedCustomer, setSelectedCustomer] = useState<number | -1>(-1);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [updateModalOpen, setUpdateModalOpen] = useState<boolean>(false);
+  const [showPasswords, setShowPasswords] = useState<{ [key: number]: boolean }>({});
   const buttonText2 = "Delete Customer";
 
   useEffect(() => {
@@ -63,6 +64,20 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
     fetchCustomers();
     setSelectedCustomer(-1);
     setUpdateModalOpen(false);
+  };
+
+  const togglePasswordVisibility = (customerId: number) => {
+    setShowPasswords((prev) => ({
+      ...prev,
+      [customerId]: !prev[customerId],
+    }));
+  };
+
+  const renderPassword = (customer: Customer) => {
+    if (showPasswords[customer.id]) {
+      return customer.password;
+    }
+    return "*".repeat(8); // Show 8 asterisks regardless of actual password length
   };
 
   const handleSearch = (searchTerm: string) => {
@@ -145,6 +160,8 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
               <TableBody>
                 {filteredCustomers.map((customer) => {
                   const isSelected = selectedCustomer === customer.id;
+                  const isPasswordVisible = showPasswords[customer.id];
+
                   return (
                     <TableRow
                       key={customer.id}
@@ -164,7 +181,22 @@ const DisplayCustomers: React.FC<{}> = ({}) => {
                       <TableCell>{customer.id}</TableCell>
                       <TableCell>{customer.name}</TableCell>
                       <TableCell>{customer.email}</TableCell>
-                      <TableCell>{customer.password}</TableCell>
+                      <TableCell>
+                        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                          <span>{renderPassword(customer)}</span>
+
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              togglePasswordVisibility(customer.id);
+                            }}
+                          >
+                            {isPasswordVisible ? "Hide" : "Show"}
+                          </Button>
+                        </Box>
+                      </TableCell>
                     </TableRow>
                   );
                 })}
